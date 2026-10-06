@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #f4f8ff; color: #10274d; font-family: Arial, Helvetica, sans-serif; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+::selection { background: #a9d8ff; color: #10274d; }
+.loyalty-card {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(132, 204, 255, .46) 0, transparent 35%),
+    repeating-radial-gradient(circle at 105% -10%, transparent 0 27px, rgba(255,255,255,.09) 28px 29px, transparent 30px 51px),
+    linear-gradient(135deg, #256dcb 0%, #1452b3 48%, #0b347c 100%);
+}
+.form-input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #bfd1e9;
+  border-radius: 12px;
+  background: #fff;
+  padding: 11px 14px;
+  color: #10274d;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+}
+.form-input::placeholder { color: #7790b0; }
+.form-input:focus-visible { border-color: #1856b9; box-shadow: 0 0 0 3px rgba(24,86,185,.16); }
+button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid #1856b9; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
