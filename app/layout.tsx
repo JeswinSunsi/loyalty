@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "M Souq Rewards",
-  description: "Your M Souq loyalty card. Show your QR code at checkout and earn a reward after six purchases.",
+  description: "Preview the M Souq loyalty card and staff checkout experience.",
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
 };
 
