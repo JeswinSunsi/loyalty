@@ -2,7 +2,6 @@
 import { RouterLink } from 'vue-router';
 import { ArrowUpRight } from '@lucide/vue';
 import BrandMark from './BrandMark.vue';
-import { memberCard, STAMP_TARGET } from '../store';
 withDefaults(defineProps<{ staff?: boolean; inverse?: boolean }>(), { staff: false, inverse: false });
 </script>
 <template>
@@ -16,12 +15,7 @@ withDefaults(defineProps<{ staff?: boolean; inverse?: boolean }>(), { staff: fal
       </RouterLink>
       <nav class="header-nav" aria-label="Main">
         <RouterLink v-if="staff" to="/" class="nav-link">Customer site <ArrowUpRight :size="15" aria-hidden="true" /></RouterLink>
-        <RouterLink v-else to="/card/" class="nav-card" :aria-label="memberCard ? `My card, ${memberCard.marks} of ${STAMP_TARGET} stamps` : 'My card'">
-          My card
-          <span v-if="memberCard" class="nav-dots" aria-hidden="true">
-            <span v-for="i in STAMP_TARGET" :key="i" :class="{ on: i <= memberCard.marks }" />
-          </span>
-        </RouterLink>
+        <RouterLink v-else to="/card/" class="nav-card">My card</RouterLink>
       </nav>
     </div>
   </header>

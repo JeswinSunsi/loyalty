@@ -97,13 +97,8 @@ main:focus { outline: none; }
 .header-nav { display: flex; align-items: center; }
 .nav-link { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 4px; color: var(--muted); font-size: 15px; font-weight: 500; }
 .nav-card { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 16px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 15px; font-weight: 650; }
-.nav-dots { display: inline-flex; gap: 4px; }
-.nav-dots > span { width: 7px; height: 7px; border-radius: 50%; background: rgb(255 255 255 / .28); }
-.nav-dots > span.on { background: var(--gold); }
 .site-header.is-inverse { background: var(--brand); border-bottom-color: transparent; color: #fff; --mark-bg: #fff; --mark-fg: var(--brand); }
 .is-inverse .nav-card { background: #fff; color: var(--ink); }
-.is-inverse .nav-dots > span { background: rgb(22 19 58 / .16); }
-.is-inverse .nav-dots > span.on { background: var(--brand); }
 
 .site-footer { border-top: 1px solid var(--line); }
 .footer-inner { display: flex; flex-direction: column-reverse; gap: 4px; max-width: var(--column); margin-inline: auto; padding: 20px var(--gutter) calc(24px + env(safe-area-inset-bottom)); color: var(--muted); font-size: 14px; }
