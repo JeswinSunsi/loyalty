@@ -59,22 +59,22 @@ function when(at: string) {
           <p>This browser isn’t letting us save your card. Your stamps may not be here next time.</p>
         </div>
 
-        <header class="page-head">
+        <header v-reveal class="page-head">
           <p class="kicker">Hello, {{ firstName }}</p>
           <h1 class="h1" aria-live="polite">{{ headline }}</h1>
         </header>
 
         <div class="card-grid">
-          <section class="panel" aria-label="Your card">
+          <section v-reveal="1" class="panel panel-stage" aria-label="Your card">
             <LoyaltyCard :name="memberCard.name" :number="memberCard.number" :marks="memberCard.marks" />
-            <button type="button" class="btn btn-primary btn-lg btn-block code-btn" @click="showCode = true">
+            <button type="button" class="btn btn-gold btn-lg btn-block code-btn" @click="showCode = true">
               <QrCode :size="22" aria-hidden="true" /> Show my code
             </button>
             <p class="help-text">Press this at the till. The cashier scans the code to add your stamp.</p>
           </section>
 
           <div class="card-side">
-            <section class="panel" :class="{ 'panel-accent': ready }" aria-labelledby="progress-title">
+            <section v-reveal="2" class="panel" :class="{ 'panel-accent': ready }" aria-labelledby="progress-title">
               <h2 id="progress-title" class="h3">Your progress</h2>
               <p class="progress-count"><strong>{{ marks }}</strong> of {{ STAMP_TARGET }} stamps</p>
               <div class="progress" role="progressbar" :aria-valuenow="marks" aria-valuemin="0" :aria-valuemax="STAMP_TARGET" aria-labelledby="progress-title">
@@ -86,7 +86,7 @@ function when(at: string) {
               <RouterLink :to="{ path: '/', hash: '#gifts' }" class="text-link">See the gifts you can choose <ArrowRight :size="18" aria-hidden="true" /></RouterLink>
             </section>
 
-            <section class="panel" aria-labelledby="activity-title">
+            <section v-reveal="3" class="panel" aria-labelledby="activity-title">
               <h2 id="activity-title" class="h3">Recent activity</h2>
               <ul class="activity">
                 <li v-for="item in memberCard.activity" :key="item.id" :class="`is-${item.kind}`">
@@ -105,7 +105,7 @@ function when(at: string) {
       </div>
 
       <div v-else class="container">
-        <section class="panel empty-state" aria-labelledby="empty-title">
+        <section v-reveal class="panel empty-state" aria-labelledby="empty-title">
           <span class="empty-icon"><QrCode :size="36" aria-hidden="true" /></span>
           <h1 id="empty-title" class="h1">No card on this phone yet</h1>
           <p class="lede">Your card is saved in the browser where you made it. If you don’t have one yet, it only takes a minute.</p>

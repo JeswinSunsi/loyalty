@@ -22,7 +22,7 @@ function submit() {
       <div class="container">
         <RouterLink to="/" class="back-link"><ArrowLeft :size="20" aria-hidden="true" /> Back to home</RouterLink>
         <div class="join-grid">
-          <section class="panel join-panel" aria-labelledby="join-title">
+          <section v-reveal class="panel join-panel" aria-labelledby="join-title">
             <p class="kicker">Get your free card</p>
             <h1 id="join-title" class="h1">What should we call you?</h1>
             <p class="lede">Just your name. Your card is ready straight away.</p>
@@ -49,7 +49,7 @@ function submit() {
             </ul>
           </section>
 
-          <aside class="join-preview" aria-label="Card preview">
+          <aside v-reveal="2" class="join-preview" aria-label="Card preview">
             <p class="preview-label">Your card will look like this</p>
             <LoyaltyCard :name="name.trim() || 'Your name'" :marks="0" />
             <p class="preview-note"><Gift :size="22" aria-hidden="true" /> Collect 3 stamps on this card to get a free gift.</p>

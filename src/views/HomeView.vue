@@ -4,6 +4,7 @@ import { ArrowRight, Check, ChevronDown, Gift, Headphones, PenTool, QrCode, Shop
 import SiteHeader from '../components/SiteHeader.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
+import SealRing from '../components/SealRing.vue';
 import { memberCard } from '../store';
 
 const steps = [
@@ -34,13 +35,13 @@ const faqs = [
         <div class="container hero-grid">
           <div class="hero-copy">
             <p class="kicker">M Souq Rewards</p>
-            <h1 class="h-display">Collect 3 stamps.<br /><em>Get a free gift.</em></h1>
+            <h1 class="h-display">Collect 3 stamps.<br /><em class="foil-text">Get a free gift.</em></h1>
             <p class="lede lede-lg">Get one stamp each time you shop with us. When your card is full, choose a free gift in store.</p>
             <div class="hero-actions">
-              <RouterLink :to="memberCard ? '/card/' : '/join/'" class="btn btn-primary btn-lg">
+              <RouterLink :to="memberCard ? '/card/' : '/join/'" class="btn btn-gold btn-lg">
                 {{ memberCard ? 'Open my card' : 'Get your free card' }} <ArrowRight :size="20" aria-hidden="true" />
               </RouterLink>
-              <RouterLink :to="{ path: '/', hash: '#how-it-works' }" class="btn btn-secondary btn-lg">How it works</RouterLink>
+              <RouterLink :to="{ path: '/', hash: '#how-it-works' }" class="btn btn-outline-light btn-lg">How it works</RouterLink>
             </div>
             <ul class="trust-list">
               <li><Check :size="20" aria-hidden="true" /> Free to join</li>
@@ -49,7 +50,10 @@ const faqs = [
             </ul>
           </div>
           <figure class="hero-visual">
-            <LoyaltyCard name="Layla" number="20250316" :marks="2" />
+            <div class="hero-stage">
+              <SealRing class="hero-ring" />
+              <div class="hero-card"><LoyaltyCard name="Layla" number="20250316" :marks="2" /></div>
+            </div>
             <figcaption>Example card: 2 stamps collected, 1 more for a free gift.</figcaption>
           </figure>
         </div>
@@ -57,14 +61,14 @@ const faqs = [
 
       <section id="how-it-works" class="section" aria-labelledby="how-heading">
         <div class="container">
-          <div class="section-head">
+          <div v-reveal class="section-head">
             <h2 id="how-heading" class="h2">How it works</h2>
             <p class="lede">Three simple steps. No points to count.</p>
           </div>
           <ol class="steps">
-            <li v-for="(step, i) in steps" :key="step.title" class="step">
+            <li v-for="(step, i) in steps" :key="step.title" v-reveal="i + 1" class="step">
               <div class="step-top">
-                <span class="step-num" aria-hidden="true">{{ i + 1 }}</span>
+                <span class="step-num foil-text foil-deep" aria-hidden="true">{{ i + 1 }}</span>
                 <component :is="step.icon" class="step-icon" :size="26" :stroke-width="1.6" aria-hidden="true" />
               </div>
               <h3 class="h3"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
@@ -76,12 +80,12 @@ const faqs = [
 
       <section id="gifts" class="section section-alt" aria-labelledby="gift-heading">
         <div class="container">
-          <div class="section-head">
+          <div v-reveal class="section-head">
             <h2 id="gift-heading" class="h2">Gifts you can choose</h2>
             <p class="lede">Fill your card with 3 stamps and choose one, free. The selection changes with the season, so ask in store to see today’s gifts.</p>
           </div>
           <ul class="gift-grid">
-            <li v-for="gift in gifts" :key="gift.name" class="gift">
+            <li v-for="(gift, i) in gifts" :key="gift.name" v-reveal="i + 1" class="gift">
               <span class="gift-icon"><component :is="gift.icon" :size="30" aria-hidden="true" /></span>
               <h3 class="h3">{{ gift.name }}</h3>
               <p>{{ gift.note }}</p>
@@ -93,11 +97,11 @@ const faqs = [
 
       <section id="questions" class="section" aria-labelledby="faq-heading">
         <div class="container faq-layout">
-          <div class="section-head">
+          <div v-reveal class="section-head">
             <h2 id="faq-heading" class="h2">Common questions</h2>
             <p class="lede">Still unsure? Our team at the till is happy to help.</p>
           </div>
-          <div class="faq">
+          <div v-reveal="1" class="faq">
             <details v-for="item in faqs" :key="item.q">
               <summary>{{ item.q }}<ChevronDown class="faq-icon" :size="24" aria-hidden="true" /></summary>
               <p>{{ item.a }}</p>
@@ -108,12 +112,13 @@ const faqs = [
 
       <section class="section section-tight">
         <div class="container">
-          <div class="cta-band">
+          <div v-reveal class="cta-band">
+            <SealRing class="cta-ring" />
             <div>
-              <h2 class="h2">Start collecting today</h2>
+              <h2 class="h2">Start collecting <em class="foil-text">today</em></h2>
               <p>It takes less than a minute. All you need is your name.</p>
             </div>
-            <RouterLink :to="memberCard ? '/card/' : '/join/'" class="btn btn-light btn-lg">
+            <RouterLink :to="memberCard ? '/card/' : '/join/'" class="btn btn-gold btn-lg">
               {{ memberCard ? 'Open my card' : 'Get your free card' }} <ArrowRight :size="20" aria-hidden="true" />
             </RouterLink>
           </div>

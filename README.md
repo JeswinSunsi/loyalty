@@ -38,6 +38,14 @@ This branch carries the **Standard** theme: a proper, formal retail site with a 
 - Source Serif 4 headlines over Source Sans 3 body text (Google Fonts, `index.html`), in sentence case with an 18px body.
 - Warm white page and white panels, one deep forest green for actions, and a soft gold for the gift and small accents. Tokens are at the top of `src/style.css`.
 - The personality is kept small: a gold-ringed seal for the logo, a gold hairline and gold-foil stamps on the card, serif step numerals, and a gold rule before section labels.
+- No box shadows: depth comes from colour, borders and a deep green hero stage with a gold glow.
+- Motion:
+  - the hero rises in and the card deals in, then floats in front of a slowly turning gold seal ring (`src/components/SealRing.vue`);
+  - stamps press in with a spring, and a gold light sweeps across the card;
+  - headline accents are animated gold foil;
+  - sections reveal on scroll with `v-reveal` (`src/reveal.ts`), and step rules draw themselves in;
+  - gift tiles lift and flood gold on hover, and button arrows nudge forward;
+  - the progress bar fills on load.
 - Rectangular buttons with text labels and 48px+ tap targets. No hidden gestures, carousels or rotated elements.
 - Progress is stated in words and shown as a bar, Starbucks-style ("2 of 3 stamps · 1 more stamp to get your free gift").
 - The checkout code opens from an explicit button in a native `<dialog>` (`src/components/CodeDialog.vue`), with Escape, backdrop and Done all closing it.
