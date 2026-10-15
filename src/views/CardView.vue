@@ -9,12 +9,15 @@ import InkStamp from '../components/InkStamp.vue';
 import { formatCardNumber, memberCard, STAMP_TARGET, storageAvailable, type ActivityKind } from '../store';
 import { qrShape } from '../qr';
 import { FLIP_MS } from '../motion';
+import { curtain } from '../transition';
 
 const route = useRoute();
 const router = useRouter();
 // The welcome only greets the first visit; drop the flag so a refresh shows the everyday view.
 const welcome = ref(route.query.welcome === '1');
 if (welcome.value) void router.replace({ query: {} });
+// Came in behind the card curtain: the page settles into place as the curtain sweeps away.
+const arriving = curtain.value !== 'idle';
 const remaining = computed(() => STAMP_TARGET - (memberCard.value?.marks ?? 0));
 const ready = computed(() => remaining.value === 0);
 const firstName = computed(() => memberCard.value?.name.split(' ')[0] ?? '');
@@ -59,7 +62,7 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
     <SiteHeader inverse />
     <main id="main-content">
       <template v-if="memberCard">
-        <section class="hero member-hero" :class="{ 'is-welcome': welcome }">
+        <section class="hero member-hero" :class="{ 'is-welcome': welcome, 'is-arriving': arriving }">
           <InkStamp class="hero-ghost" ring="MEMBER · M SOUQ · REWARDS · " :texture="false" />
           <div class="container hero-inner">
             <p v-if="!storageAvailable" class="callout" role="status">This browser isn’t letting us save your card. Your stamps may not be here next time.</p>
@@ -71,7 +74,7 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
             <h1 v-else class="display" aria-live="polite">{{ headline[0] }}<br /><span>{{ headline[1] }}</span></h1>
             <p class="hero-lede">{{ lede }}</p>
 
-            <div ref="cardEl" class="member-card" :class="{ 'is-new': welcome }">
+            <div ref="cardEl" class="member-card" :class="{ 'is-new': welcome, 'is-arriving': arriving }">
               <LoyaltyCard v-model:flipped="showCode" :name="memberCard.name" :number="memberCard.number" :marks="memberCard.marks" :qr="qr" flippable />
             </div>
             <div class="try-caption member-caption">
@@ -154,7 +157,7 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
         </section>
       </template>
 
-      <section v-else class="hero member-hero">
+      <section v-else class="hero member-hero" :class="{ 'is-arriving': arriving }">
         <InkStamp class="hero-ghost" ring="STAMP · STAMP · STAMP · FREE GIFT · " :texture="false" />
         <div class="container hero-inner">
           <p class="hero-kicker">My card</p>

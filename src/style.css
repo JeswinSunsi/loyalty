@@ -97,13 +97,8 @@ main:focus { outline: none; }
 .header-nav { display: flex; align-items: center; }
 .nav-link { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 4px; color: var(--muted); font-size: 15px; font-weight: 500; }
 .nav-card { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 16px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 15px; font-weight: 650; }
-.nav-dots { display: inline-flex; gap: 4px; }
-.nav-dots > span { width: 7px; height: 7px; border-radius: 50%; background: rgb(255 255 255 / .28); }
-.nav-dots > span.on { background: var(--gold); }
 .site-header.is-inverse { background: var(--brand); border-bottom-color: transparent; color: #fff; --mark-bg: #fff; --mark-fg: var(--brand); }
 .is-inverse .nav-card { background: #fff; color: var(--ink); }
-.is-inverse .nav-dots > span { background: rgb(22 19 58 / .16); }
-.is-inverse .nav-dots > span.on { background: var(--brand); }
 
 .site-footer { border-top: 1px solid var(--line); }
 .footer-inner { display: flex; flex-direction: column-reverse; gap: 4px; max-width: var(--column); margin-inline: auto; padding: 20px var(--gutter) calc(24px + env(safe-area-inset-bottom)); color: var(--muted); font-size: 14px; }
@@ -347,11 +342,25 @@ main:focus { outline: none; }
 .callout > svg { flex-shrink: 0; margin-top: 2px; color: var(--gold-ink); }
 .callout a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
-.join { padding-block: 16px 56px; }
+/* ───────────── Join (same violet hero as the front page; the form sits on it like a slip of card stock) ───────────── */
+.join-page { background: var(--brand); }
+.join { position: relative; padding-block: 16px 56px; }
+.join-hero :focus-visible { outline-color: var(--gold); }
+.join-hero .back-link { color: rgb(255 255 255 / .72); }
+.join-hero .hero-kicker { margin-top: 6px; }
+.join-hero .callout { margin-top: 24px; border-color: transparent; color: var(--ink); box-shadow: 0 10px 24px -14px rgb(10 8 40 / .6); }
+.join-hero .callout a { color: var(--brand-ink); }
 .join-form { margin-top: 28px; }
-.join-preview { margin-top: 36px; padding: 28px 20px 22px; border-radius: 28px; background: var(--bg-2); }
-.join-preview-note { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
-.join-preview-note svg { flex-shrink: 0; color: var(--gold-ink); }
+.join-hero .field-label { margin-bottom: 10px; color: rgb(255 255 255 / .78); font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; }
+.join-hero .input { border-color: transparent; box-shadow: 0 1px 0 rgb(10 8 40 / .12), 0 14px 30px -16px rgb(10 8 40 / .55); }
+.join-hero .input:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgb(255 184 28 / .4), 0 14px 30px -16px rgb(10 8 40 / .55); }
+.join-hero .input[aria-invalid="true"] { border-color: #ffb4a8; box-shadow: 0 0 0 4px rgb(255 180 168 / .35); }
+.join-hero .field-error { display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 999px; background: #ffe3de; color: var(--danger); font-weight: 600; }
+.join-hero .field-hint { margin: 12px 0 22px; color: rgb(255 255 255 / .72); }
+.join-preview { margin-top: 44px; padding-top: 28px; border-top: 1.5px dashed rgb(255 255 255 / .22); }
+.join-preview-card { transform: rotate(-2deg); }
+.join-preview-note { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 22px; color: rgb(255 255 255 / .8); font-size: 14px; text-align: center; }
+.join-preview-note svg { flex-shrink: 0; color: var(--gold); }
 
 /* ───────────── Member card page (same violet hero, receipt and coupon as the front page) ───────────── */
 .member-hero .hero-kicker { display: flex; align-items: center; gap: 8px; }
@@ -368,6 +377,41 @@ main:focus { outline: none; }
 .member-hero.is-welcome .display { animation-delay: .08s; }
 .member-hero.is-welcome .hero-lede { animation-delay: .16s; }
 .member-card.is-new { animation: deal .8s .2s var(--ease-out) backwards; }
+/* Behind the card curtain: everything waits under the cover, then settles in top-down as the curtain sweeps away. */
+.member-hero.is-arriving .hero-inner > :is(.hero-kicker, .display, .hero-lede, .member-caption, .hero-cta) { animation: rise .6s .28s var(--ease-out) backwards; }
+.member-hero.is-arriving .display { animation-delay: .34s; }
+.member-hero.is-arriving .hero-lede { animation-delay: .4s; }
+.member-hero.is-arriving :is(.member-caption, .hero-cta) { animation-delay: .52s; }
+.member-card.is-arriving, .member-hero.is-arriving .empty-card { animation: deal .8s .4s var(--ease-out) backwards; }
+
+/* ───────────── Card curtain (plays on the way into the card page) ───────────── */
+.ct { position: fixed; inset: 0; z-index: 100; overflow: hidden; }
+.ct.is-reveal { pointer-events: none; }
+.ct-panel {
+  --zz: 18px;
+  position: absolute; inset: -18px 0; display: grid; place-items: center;
+  background: radial-gradient(55% 40% at 50% 46%, rgb(255 255 255 / .12), transparent 70%), var(--brand); color: #fff;
+  -webkit-mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--zz) 51% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--zz) 51% repeat-x;
+  mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--zz) 51% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--zz) 51% repeat-x;
+  will-change: transform;
+}
+.is-cover .ct-panel { animation: ct-in .5s cubic-bezier(.7, 0, .25, 1) both; }
+.is-reveal .ct-panel { animation: ct-out .6s cubic-bezier(.65, 0, .3, 1) both; }
+.ct-mark { position: relative; display: grid; justify-items: center; gap: 22px; }
+.ct-mark::before { content: ""; position: absolute; top: -14px; left: 50%; width: 160px; height: 160px; margin-left: -80px; border: 2px solid var(--gold); border-radius: 50%; opacity: 0; }
+.ct-stamp { width: 132px; height: 132px; color: #fff; transform: rotate(-10deg); }
+.is-cover .ct-stamp { animation: ct-press .38s .36s var(--ease-out) both; }
+.is-cover .ct-mark::before { animation: ct-ring .7s .6s ease-out forwards; }
+.ct-label { color: rgb(255 255 255 / .78); font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+.is-cover .ct-label { animation: rise .4s .5s var(--ease-out) both; }
+@keyframes ct-in { from { transform: translateY(100%); } }
+@keyframes ct-out { to { transform: translateY(-100%); } }
+@keyframes ct-press {
+  0% { opacity: 0; transform: rotate(-26deg) scale(1.8); }
+  60% { opacity: 1; transform: rotate(-8deg) scale(.93); }
+  100% { opacity: 1; transform: rotate(-10deg) scale(1); }
+}
+@keyframes ct-ring { 0% { opacity: .9; transform: scale(.82); } 100% { opacity: 0; transform: scale(1.25); } }
 
 .r-meta { display: grid; gap: 6px; margin: 0; }
 .r-meta div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
