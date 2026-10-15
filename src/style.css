@@ -347,11 +347,25 @@ main:focus { outline: none; }
 .callout > svg { flex-shrink: 0; margin-top: 2px; color: var(--gold-ink); }
 .callout a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
-.join { padding-block: 16px 56px; }
+/* ───────────── Join (same violet hero as the front page; the form sits on it like a slip of card stock) ───────────── */
+.join-page { background: var(--brand); }
+.join { position: relative; padding-block: 16px 56px; }
+.join-hero :focus-visible { outline-color: var(--gold); }
+.join-hero .back-link { color: rgb(255 255 255 / .72); }
+.join-hero .hero-kicker { margin-top: 6px; }
+.join-hero .callout { margin-top: 24px; border-color: transparent; color: var(--ink); box-shadow: 0 10px 24px -14px rgb(10 8 40 / .6); }
+.join-hero .callout a { color: var(--brand-ink); }
 .join-form { margin-top: 28px; }
-.join-preview { margin-top: 36px; padding: 28px 20px 22px; border-radius: 28px; background: var(--bg-2); }
-.join-preview-note { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
-.join-preview-note svg { flex-shrink: 0; color: var(--gold-ink); }
+.join-hero .field-label { margin-bottom: 10px; color: rgb(255 255 255 / .78); font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; }
+.join-hero .input { border-color: transparent; box-shadow: 0 1px 0 rgb(10 8 40 / .12), 0 14px 30px -16px rgb(10 8 40 / .55); }
+.join-hero .input:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgb(255 184 28 / .4), 0 14px 30px -16px rgb(10 8 40 / .55); }
+.join-hero .input[aria-invalid="true"] { border-color: #ffb4a8; box-shadow: 0 0 0 4px rgb(255 180 168 / .35); }
+.join-hero .field-error { display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 999px; background: #ffe3de; color: var(--danger); font-weight: 600; }
+.join-hero .field-hint { margin: 12px 0 22px; color: rgb(255 255 255 / .72); }
+.join-preview { margin-top: 44px; padding-top: 28px; border-top: 1.5px dashed rgb(255 255 255 / .22); }
+.join-preview-card { transform: rotate(-2deg); }
+.join-preview-note { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 22px; color: rgb(255 255 255 / .8); font-size: 14px; text-align: center; }
+.join-preview-note svg { flex-shrink: 0; color: var(--gold); }
 
 /* ───────────── Member card page (same violet hero, receipt and coupon as the front page) ───────────── */
 .member-hero .hero-kicker { display: flex; align-items: center; gap: 8px; }
