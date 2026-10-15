@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Check, Gift, MoveUpRight, Smartphone } from '@lucide/vue';
-import type { PreviewCard } from '../preview';
+import { STAMP_TARGET, type PreviewCard } from '../preview';
 
 type MotionPermission = typeof DeviceOrientationEvent & { requestPermission?: () => Promise<'granted' | 'denied'> };
 const props = defineProps<{ card: PreviewCard }>();
 const surface = ref<HTMLDivElement | null>(null);
-const marks = computed(() => Math.max(0, Math.min(6, props.card.marks)));
+const marks = computed(() => Math.max(0, Math.min(STAMP_TARGET, props.card.marks)));
 const tiltEnabled = ref(false);
 const tiltPending = ref(false);
 const motionMessage = ref('');
@@ -121,27 +121,27 @@ function onPointerMove(event: PointerEvent) {
 <template>
   <div class="card-experience">
     <div class="card-perspective" @pointermove="onPointerMove" @pointerleave="!tiltEnabled && reset()" @pointercancel="reset">
-      <div ref="surface" class="loyalty-card" :data-complete="marks === 6">
+      <div ref="surface" class="loyalty-card" :data-complete="marks === STAMP_TARGET">
         <div class="card-guilloche" aria-hidden="true" />
         <div class="card-monogram" aria-hidden="true">m.</div>
         <div class="card-foil" aria-hidden="true" />
         <div class="card-glare" aria-hidden="true" />
         <div class="card-content">
-          <div class="card-topline"><span class="card-brand">M Souq<span>.</span></span><span class="card-edition">THE EVERYDAY CLUB<MoveUpRight :size="15" /></span></div>
-          <div class="card-member"><span class="card-label">A LITTLE THANK YOU, FOR</span><p>{{ card.name }}</p></div>
-          <div class="card-stamps" role="img" :aria-label="`${marks} of 6 purchases counted${marks === 6 ? '. Reward ready.' : ''}`">
-            <span v-for="index in 6" :key="index" aria-hidden="true" class="card-stamp" :class="{ 'is-collected': index <= marks, 'is-reward': index === 6 }">
+          <div class="card-topline"><span class="card-brand">M Souq<span>.</span></span><span class="card-edition">REWARDS<MoveUpRight :size="15" /></span></div>
+          <div class="card-member"><span class="card-label">CARDHOLDER</span><p>{{ card.name }}</p></div>
+          <div class="card-stamps" role="img" :aria-label="`${marks} of ${STAMP_TARGET} stamps collected${marks === STAMP_TARGET ? '. Free gift ready.' : ''}`">
+            <span v-for="index in STAMP_TARGET" :key="index" aria-hidden="true" class="card-stamp" :class="{ 'is-collected': index <= marks, 'is-reward': index === STAMP_TARGET }">
               <Check v-if="index <= marks" :size="21" :stroke-width="2.4" />
-              <Gift v-else-if="index === 6" :size="21" :stroke-width="1.5" />
+              <Gift v-else-if="index === STAMP_TARGET" :size="21" :stroke-width="1.5" />
               <span v-else class="stamp-number">0{{ index }}</span>
             </span>
           </div>
-          <div class="card-bottomline"><span>GOOD THINGS ADD UP.</span><span aria-live="polite">{{ marks === 6 ? 'Your reward is ready' : `${marks} / 6 visits` }}</span></div>
+          <div class="card-bottomline"><span>3 STAMPS = A FREE GIFT</span><span aria-live="polite">{{ marks === STAMP_TARGET ? 'Free gift ready' : `${marks} of ${STAMP_TARGET} stamps` }}</span></div>
         </div>
       </div>
     </div>
     <div class="card-interaction-note">
-      <span class="pointer-hint"><span class="light-dot" /> Move over the card. Catch the light.</span>
+      <span class="pointer-hint"><span class="light-dot" /> Your digital rewards card</span>
       <button type="button" class="tilt-toggle" :aria-pressed="tiltEnabled" :disabled="tiltPending" @click="toggleTilt"><Smartphone :size="14" />{{ tiltPending ? 'Enabling…' : tiltEnabled ? 'Phone tilt on · Turn off' : 'Enable phone tilt' }}</button>
     </div>
     <p v-if="motionMessage" class="motion-message" role="status">{{ motionMessage }}</p>

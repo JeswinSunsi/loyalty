@@ -1,72 +1,39 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import QRCode from 'qrcode';
-import { ScanLine } from '@lucide/vue';
-import LoyaltyCard from '../components/LoyaltyCard.vue';
-import { getPreviewName, savePreviewName, type PreviewCard } from '../preview';
 import { RouterLink } from 'vue-router';
+import QRCode from 'qrcode';
+import { ArrowRight, Check, Expand, Gift, QrCode, X } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
-const savedName = getPreviewName();
-const customCard = ref<PreviewCard | null>(null);
-const card = computed(() => customCard.value ?? (savedName ? { name: savedName, marks: 0 } : { name: 'M Souq member', marks: 3 }));
-const name = ref('');
+import LoyaltyCard from '../components/LoyaltyCard.vue';
+import { memberCard, STAMP_TARGET, storageAvailable } from '../preview';
+const remaining = computed(() => STAMP_TARGET - (memberCard.value?.marks ?? 0));
 const qr = ref('');
 const qrError = ref(false);
+const codeDialog = ref<HTMLDialogElement | null>(null);
 const staffUrl = new URL(import.meta.env.BASE_URL + 'staff/?demo=1', window.location.origin).href;
 onMounted(async () => {
-  try {
-    qr.value = await QRCode.toDataURL(staffUrl, {
-      width: 420, margin: 2, errorCorrectionLevel: 'M',
-      color: { dark: '#202923', light: '#ffffff' },
-    });
-  } catch { qrError.value = true; }
+  try { qr.value = await QRCode.toDataURL(staffUrl, { width: 480, margin: 3, errorCorrectionLevel: 'M', color: { dark: '#142a57', light: '#ffffff' } }); }
+  catch { qrError.value = true; }
 });
-function previewCard() {
-  const nextName = name.value.trim().replace(/\s+/g, ' ');
-  if (!nextName) return;
-  savePreviewName(nextName);
-  customCard.value = { name: nextName, marks: 0 };
-}
+function timeLabel(at: string) { return new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
 </script>
-
 <template>
-<main class="min-h-[100dvh]">
-    <SiteHeader action-href="/" action-label="Home" />
-    <div class="mx-auto max-w-[1080px] px-4 pb-12 pt-7 sm:px-8 sm:pt-10">
-      <div class="mb-7">
-        <p class="text-sm font-bold uppercase tracking-[.12em] text-[#254fe0]">Your M Souq card</p>
-        <h1 class="mt-2 text-[clamp(2.1rem,6vw,3.5rem)] font-extrabold leading-[1.06] tracking-[-.06em] text-[#202923]">Good to see you.</h1>
-        <p class="mt-3 max-w-[600px] text-base leading-relaxed text-[#666f62]">Your next reward is {{ 6 - card.marks }} {{ 6 - card.marks === 1 ? "visit" : "visits" }} away. Show your code at checkout.</p>
-      </div>
-
-      <div class="grid items-start gap-5 md:grid-cols-[1.2fr_.8fr] md:gap-6">
-        <section aria-label="Loyalty card preview">
-          <LoyaltyCard :card="card" />
-        </section>
-
-        <div class="space-y-5">
-          <section class="rounded-[20px] border border-[#dfe3d8] bg-white p-5 text-center shadow-[0_4px_20px_rgba(34,51,29,.025)] sm:p-6" aria-label="Checkout code preview">
-            <h2 class="flex items-center justify-center gap-2 text-xl font-bold text-[#202923]"><ScanLine class="h-5 w-5 text-[#254fe0]" /> Scan at checkout</h2>
-            <div class="mx-auto mt-4 max-w-[220px] rounded-xl border border-[#dfe3d8] bg-white p-2">
-              <img v-if="qr" :src="qr" alt="Demo QR code for M Souq staff preview" width="220" height="220" class="aspect-square w-full" />
-              <p v-else-if="qrError" role="status">Code unavailable. <RouterLink to="/staff/?demo=1" class="text-[#254fe0] underline">Open staff preview</RouterLink></p>
-              <div v-else class="aspect-square w-full animate-pulse rounded-lg bg-[#edf0e7]" />
-            </div>
-            <p class="mt-3 text-sm text-[#666f62]">Demo code. Open it to see the staff view.</p>
-          </section>
-
-          <section class="rounded-[20px] border border-[#dfe3d8] bg-white p-5 shadow-[0_4px_20px_rgba(34,51,29,.025)] sm:p-6">
-            <h2 class="text-xl font-bold text-[#202923]">Preview your card</h2>
-            <p class="mt-1 text-sm text-[#666f62]">Enter a name to see how your M Souq card looks.</p>
-            <form @submit.prevent="previewCard" class="mt-4">
-              <label class="block text-sm font-semibold text-[#374632]">Your name<input required autocomplete="name" v-model="name" maxlength="60" placeholder="Enter your name" class="form-input mt-1.5" /></label>
-              <button class="mt-4 min-h-12 w-full rounded-xl bg-[#254fe0] px-5 text-base font-bold text-white hover:bg-[#193cb8]">Preview card</button>
-            </form>
-            <p class="mt-3 text-xs text-[#717a6c]">Design preview only. Your name stays in this tab. No marks are saved.</p>
-          </section>
+  <div><SiteHeader action-href="/" action-label="Rewards home" />
+    <main id="main-content" class="dashboard-shell">
+      <template v-if="memberCard">
+        <div class="page-heading"><div><p class="eyebrow">MY REWARDS CARD</p><h1>{{ remaining === 0 ? 'Your free gift is ready.' : remaining === 1 ? 'Just 1 more stamp.' : remaining + ' stamps to your free gift.' }}</h1><p class="page-description">{{ remaining === 0 ? 'Show your card in store and choose from the available gifts.' : 'Show your code at checkout. Our team will add your stamp.' }}</p></div><span class="pill" :class="{ 'success-pill': remaining === 0 }"><Gift v-if="remaining === 0" :size="15" />{{ remaining === 0 ? 'Ready to redeem' : memberCard.marks + ' of 3 stamps' }}</span></div>
+        <p v-if="!storageAvailable" class="notice" role="status">Browser storage is unavailable. Your demo progress will be lost when you refresh.</p>
+        <div class="member-grid">
+          <div class="member-main"><LoyaltyCard :card="memberCard" />
+            <section class="reward-panel"><span class="icon-tile"><Gift :size="24" /></span><div><p class="eyebrow">{{ remaining === 0 ? 'YOUR NEXT STEP' : 'WHAT YOU’RE COLLECTING FOR' }}</p><h2>{{ remaining === 0 ? 'Choose your free gift in store' : 'A free gift with 3 stamps' }}</h2><p>Cleaning pens, smart bands, earbuds, and more. Ask our team for the current selection.</p></div></section>
+            <section class="activity-panel"><div class="panel-heading"><h2>Card activity</h2><span class="small-label">THIS DEMO</span></div><ul><li v-for="item in memberCard.activity" :key="item.id"><span class="activity-dot"><Check :size="13" /></span><span>{{ item.text }}</span><time :datetime="item.at">{{ timeLabel(item.at) }}</time></li></ul></section>
+          </div>
+          <aside class="checkout-panel"><span class="icon-tile"><QrCode :size="24" /></span><h2>Show at checkout</h2><p>Open your code for the team.</p><div class="qr-frame"><img v-if="qr" :src="qr" alt="Demo QR code that opens staff checkout" width="240" height="240" /><p v-else-if="qrError" role="status">Code unavailable. You can still use the staff demo below.</p><span v-else role="status">Preparing your code…</span></div><button class="primary-action full-width" :disabled="!qr" @click="codeDialog?.showModal()"><Expand :size="18" /> Enlarge code</button><p class="form-note">Demo code: opens staff checkout. Camera scanning and live member lookup are not connected.</p><RouterLink to="/staff/?demo=1" class="text-action">Try staff checkout <ArrowRight :size="16" /></RouterLink></aside>
         </div>
-      </div>
-      <p class="mt-8 text-center text-sm text-[#717a6c]">Need staff view? <RouterLink to="/staff/login/" class="font-bold text-[#254fe0] hover:underline">Open staff sign in</RouterLink></p>
-    </div>
-  </main>
+        <p class="dashboard-note">Your demo progress stays in this tab. You can return to your card after trying staff checkout.</p>
+        <dialog ref="codeDialog" class="code-dialog" aria-labelledby="code-title"><button class="close-dialog" aria-label="Close checkout code" @click="codeDialog?.close()"><X :size="24" /></button><p class="eyebrow">M SOUQ REWARDS</p><h2 id="code-title">Show this code to the team</h2><img v-if="qr" :src="qr" alt="Demo QR code that opens staff checkout" width="480" height="480" /><p>{{ memberCard.name }}</p><span class="form-note">Demo code · opens staff checkout</span></dialog>
+      </template>
+      <section v-else class="empty-state"><span class="page-icon"><QrCode :size="28" /></span><h1>Let’s get your card ready.</h1><p class="page-description">Create a demo card to collect stamps and explore your rewards.</p><RouterLink to="/join/" class="primary-action">Create a demo card <ArrowRight :size="18" /></RouterLink><RouterLink to="/login/" class="text-action">Or try an example card</RouterLink></section>
+    </main>
+  </div>
 </template>
