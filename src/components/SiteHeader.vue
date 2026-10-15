@@ -1,17 +1,27 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
 import { ArrowUpRight } from '@lucide/vue';
-withDefaults(defineProps<{ actionHref?: string; actionLabel?: string; staff?: boolean }>(), { staff: false });
+import BrandMark from './BrandMark.vue';
+import { memberCard, STAMP_TARGET } from '../store';
+withDefaults(defineProps<{ staff?: boolean; inverse?: boolean }>(), { staff: false, inverse: false });
 </script>
 <template>
-  <div class="demo-bar"><span class="demo-badge">Interactive demo</span><span>Try the rewards experience. No real stamps or gifts are issued.</span></div>
   <a class="skip-link" href="#main-content">Skip to content</a>
-  <header class="site-header">
+  <header class="site-header" :class="{ 'is-staff': staff, 'is-inverse': inverse }">
     <div class="header-inner">
-      <RouterLink to="/" class="brand-lockup" aria-label="M Souq Rewards home"><span class="wordmark">M Souq<span>.</span></span><span class="brand-divider" /><span class="brand-caption">{{ staff ? 'STAFF CHECKOUT' : 'REWARDS' }}</span></RouterLink>
-      <nav aria-label="Main navigation">
-        <RouterLink v-if="!staff" class="header-how" :to="{ path: '/', hash: '#how-it-works' }">How it works</RouterLink>
-        <RouterLink v-if="actionHref && actionLabel" :to="actionHref" class="header-action">{{ actionLabel }}<ArrowUpRight :size="16" aria-hidden="true" /></RouterLink>
+      <RouterLink to="/" class="brand" aria-label="M Souq Rewards home">
+        <BrandMark :size="30" />
+        <span class="brand-name">M Souq</span>
+        <span class="brand-tag">{{ staff ? 'Staff' : 'Rewards' }}</span>
+      </RouterLink>
+      <nav class="header-nav" aria-label="Main">
+        <RouterLink v-if="staff" to="/" class="nav-link">Customer site <ArrowUpRight :size="15" aria-hidden="true" /></RouterLink>
+        <RouterLink v-else to="/card/" class="nav-card" :aria-label="memberCard ? `My card, ${memberCard.marks} of ${STAMP_TARGET} stamps` : 'My card'">
+          My card
+          <span v-if="memberCard" class="nav-dots" aria-hidden="true">
+            <span v-for="i in STAMP_TARGET" :key="i" :class="{ on: i <= memberCard.marks }" />
+          </span>
+        </RouterLink>
       </nav>
     </div>
   </header>

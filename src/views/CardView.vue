@@ -1,39 +1,92 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 import QRCode from 'qrcode';
-import { ArrowRight, Check, Expand, Gift, QrCode, X } from '@lucide/vue';
+import { ArrowRight, Gift, QrCode, RotateCcw, Sparkles, Stamp } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
+import SiteFooter from '../components/SiteFooter.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
-import { memberCard, STAMP_TARGET, storageAvailable } from '../preview';
+import { memberCard, STAMP_TARGET, storageAvailable, type ActivityKind } from '../store';
+
+const route = useRoute();
+const router = useRouter();
+// The welcome only greets the first visit; drop the flag so a refresh shows the everyday view.
+const welcome = ref(route.query.welcome === '1');
+if (welcome.value) void router.replace({ query: {} });
 const remaining = computed(() => STAMP_TARGET - (memberCard.value?.marks ?? 0));
+const firstName = computed(() => memberCard.value?.name.split(' ')[0] ?? '');
+const headline = computed(() => remaining.value === 0 ? 'Your free gift is ready.' : remaining.value === 1 ? 'One more stamp to go.' : `${remaining.value} stamps to your free gift.`);
 const qr = ref('');
 const qrError = ref(false);
-const codeDialog = ref<HTMLDialogElement | null>(null);
-const staffUrl = new URL(import.meta.env.BASE_URL + 'staff/?demo=1', window.location.origin).href;
+const showCode = ref(false);
+
 onMounted(async () => {
-  try { qr.value = await QRCode.toDataURL(staffUrl, { width: 480, margin: 3, errorCorrectionLevel: 'M', color: { dark: '#142a57', light: '#ffffff' } }); }
+  if (!memberCard.value) return;
+  const url = new URL(`${import.meta.env.BASE_URL}staff/?card=${memberCard.value.number}`, window.location.origin).href;
+  try { qr.value = await QRCode.toDataURL(url, { width: 480, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#17140f', light: '#ffffff' } }); }
   catch { qrError.value = true; }
 });
-function timeLabel(at: string) { return new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+
+const activityIcons: Record<ActivityKind, typeof Stamp> = { created: Sparkles, stamp: Stamp, redeemed: Gift };
+const dateFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' });
+const timeFormat = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+function when(at: string) {
+  const date = new Date(at);
+  return date.toDateString() === new Date().toDateString() ? `Today, ${timeFormat.format(date)}` : dateFormat.format(date);
+}
+const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(new Date(memberCard.value.since)) : '');
 </script>
+
 <template>
-  <div><SiteHeader action-href="/" action-label="Rewards home" />
-    <main id="main-content" class="dashboard-shell">
+  <div class="page-shell">
+    <SiteHeader />
+    <main id="main-content" class="container member">
       <template v-if="memberCard">
-        <div class="page-heading"><div><p class="eyebrow">MY REWARDS CARD</p><h1>{{ remaining === 0 ? 'Your free gift is ready.' : remaining === 1 ? 'Just 1 more stamp.' : remaining + ' stamps to your free gift.' }}</h1><p class="page-description">{{ remaining === 0 ? 'Show your card in store and choose from the available gifts.' : 'Show your code at checkout. Our team will add your stamp.' }}</p></div><span class="pill" :class="{ 'success-pill': remaining === 0 }"><Gift v-if="remaining === 0" :size="15" />{{ remaining === 0 ? 'Ready to redeem' : memberCard.marks + ' of 3 stamps' }}</span></div>
-        <p v-if="!storageAvailable" class="notice" role="status">Browser storage is unavailable. Your demo progress will be lost when you refresh.</p>
-        <div class="member-grid">
-          <div class="member-main"><LoyaltyCard :card="memberCard" />
-            <section class="reward-panel"><span class="icon-tile"><Gift :size="24" /></span><div><p class="eyebrow">{{ remaining === 0 ? 'YOUR NEXT STEP' : 'WHAT YOU’RE COLLECTING FOR' }}</p><h2>{{ remaining === 0 ? 'Choose your free gift in store' : 'A free gift with 3 stamps' }}</h2><p>Cleaning pens, smart bands, earbuds, and more. Ask our team for the current selection.</p></div></section>
-            <section class="activity-panel"><div class="panel-heading"><h2>Card activity</h2><span class="small-label">THIS DEMO</span></div><ul><li v-for="item in memberCard.activity" :key="item.id"><span class="activity-dot"><Check :size="13" /></span><span>{{ item.text }}</span><time :datetime="item.at">{{ timeLabel(item.at) }}</time></li></ul></section>
+        <p v-if="!storageAvailable" class="callout" role="status">This browser isn’t letting us save your card. Your stamps may not be here next time.</p>
+
+        <header class="member-head" :class="{ 'is-welcome': welcome }">
+          <template v-if="welcome">
+            <p class="welcome-tag"><Sparkles :size="14" aria-hidden="true" /> Welcome to M Souq Rewards</p>
+            <h1 class="headline">You’re in, {{ firstName }}.</h1>
+            <p class="member-lede">At checkout, tap your card to show your code and collect your first stamp.</p>
+          </template>
+          <template v-else>
+            <p class="kicker">Hi, {{ firstName }}</p>
+            <h1 class="headline" aria-live="polite">{{ headline }}</h1>
+          </template>
+        </header>
+
+        <div class="member-stack">
+          <div class="member-card" :class="{ 'is-new': welcome }">
+            <LoyaltyCard v-model:flipped="showCode" :name="memberCard.name" :number="memberCard.number" :marks="memberCard.marks" :qr="qr" flippable />
+            <button class="flip-hint" :class="{ 'is-ready': remaining === 0 }" @click="showCode = !showCode">
+              <template v-if="showCode"><RotateCcw :size="16" aria-hidden="true" /> Back to my stamps</template>
+              <template v-else><QrCode :size="16" aria-hidden="true" /> {{ remaining === 0 ? 'Tap your card to redeem your gift' : 'Tap your card to show your code' }}</template>
+            </button>
+            <p v-if="qrError" class="callout" role="status">Your code couldn’t load. Read your card number out at checkout instead.</p>
           </div>
-          <aside class="checkout-panel"><span class="icon-tile"><QrCode :size="24" /></span><h2>Show at checkout</h2><p>Open your code for the team.</p><div class="qr-frame"><img v-if="qr" :src="qr" alt="Demo QR code that opens staff checkout" width="240" height="240" /><p v-else-if="qrError" role="status">Code unavailable. You can still use the staff demo below.</p><span v-else role="status">Preparing your code…</span></div><button class="primary-action full-width" :disabled="!qr" @click="codeDialog?.showModal()"><Expand :size="18" /> Enlarge code</button><p class="form-note">Demo code: opens staff checkout. Camera scanning and live member lookup are not connected.</p><RouterLink to="/staff/?demo=1" class="text-action">Try staff checkout <ArrowRight :size="16" /></RouterLink></aside>
+
+          <section class="panel activity" aria-labelledby="activity-title">
+            <div class="panel-head"><h2 id="activity-title">Activity</h2><span>Member since {{ sinceLabel }}</span></div>
+            <ul>
+              <li v-for="item in memberCard.activity" :key="item.id" :class="`is-${item.kind}`">
+                <span class="activity-icon"><component :is="activityIcons[item.kind]" :size="15" aria-hidden="true" /></span>
+                <span class="activity-text">{{ item.text }}</span>
+                <time :datetime="item.at">{{ when(item.at) }}</time>
+              </li>
+            </ul>
+          </section>
         </div>
-        <p class="dashboard-note">Your demo progress stays in this tab. You can return to your card after trying staff checkout.</p>
-        <dialog ref="codeDialog" class="code-dialog" aria-labelledby="code-title"><button class="close-dialog" aria-label="Close checkout code" @click="codeDialog?.close()"><X :size="24" /></button><p class="eyebrow">M SOUQ REWARDS</p><h2 id="code-title">Show this code to the team</h2><img v-if="qr" :src="qr" alt="Demo QR code that opens staff checkout" width="480" height="480" /><p>{{ memberCard.name }}</p><span class="form-note">Demo code · opens staff checkout</span></dialog>
+
       </template>
-      <section v-else class="empty-state"><span class="page-icon"><QrCode :size="28" /></span><h1>Let’s get your card ready.</h1><p class="page-description">Create a demo card to collect stamps and explore your rewards.</p><RouterLink to="/join/" class="primary-action">Create a demo card <ArrowRight :size="18" /></RouterLink><RouterLink to="/login/" class="text-action">Or try an example card</RouterLink></section>
+
+      <section v-else class="empty">
+        <div class="empty-card" aria-hidden="true"><LoyaltyCard name="Your name" :marks="0" decorative /></div>
+        <h1 class="headline">No card on this device yet.</h1>
+        <p class="lede">Your card is saved in the browser where you made it. Haven’t got one? It takes a few seconds.</p>
+        <RouterLink to="/join/" class="btn btn-primary btn-lg">Get your free card <ArrowRight :size="18" aria-hidden="true" /></RouterLink>
+      </section>
     </main>
+    <SiteFooter />
   </div>
 </template>

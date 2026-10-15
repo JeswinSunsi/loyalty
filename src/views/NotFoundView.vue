@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import { ArrowRight } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
 </script>
 <template>
-  <main class="min-h-[100dvh]">
-    <SiteHeader action-href="/" action-label="Home" />
-    <div id="main-content" class="mx-auto max-w-[520px] px-4 py-16 sm:px-8">
-      <h1 class="text-4xl font-extrabold tracking-[-.06em]">Page not found.</h1>
-      <RouterLink to="/" class="primary-action mt-7">Back to rewards</RouterLink>
-    </div>
-  </main>
+  <div class="page-shell">
+    <SiteHeader />
+    <main id="main-content" class="container empty">
+      <p class="lost-code" aria-hidden="true">404</p>
+      <h1 class="headline">This page isn’t on the card.</h1>
+      <p class="lede">The link may be old or mistyped. Let’s get you back to your rewards.</p>
+      <RouterLink to="/" class="btn btn-primary btn-lg">Back to rewards <ArrowRight :size="18" aria-hidden="true" /></RouterLink>
+    </main>
+  </div>
 </template>

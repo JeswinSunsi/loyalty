@@ -1,58 +1,126 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
-import { ArrowRight, Check, Gift, RotateCcw, ScanLine, ShieldCheck } from '@lucide/vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ArrowRight, Check, Gift, RotateCcw, ScanLine, Search, Stamp } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
-import { addStamp, loadExample, memberCard, redeemGift, undoChange } from '../preview';
+import { addStamp, findCard, formatCardNumber, memberCard, redeemGift, restoreCard, STAMP_TARGET, type MemberCard } from '../store';
+
 const route = useRoute();
-const loaded = ref(route.query.demo === '1');
-if (loaded.value && !memberCard.value) loadExample();
+const router = useRouter();
+const query = ref(typeof route.query.card === 'string' ? route.query.card : '');
+const loaded = ref(findCard(query.value));
+const lookupError = ref(query.value && !loaded.value ? 'That code doesn’t match a card on this device.' : '');
 const card = computed(() => loaded.value ? memberCard.value : null);
+const initial = computed(() => card.value?.name.charAt(0).toUpperCase() ?? '');
 const notice = ref('');
 const changed = ref(false);
 const confirming = ref(false);
-let previous: NonNullable<typeof memberCard.value> | null = null;
-function openCard() {
-  if (!memberCard.value) loadExample();
+let previous: MemberCard | null = null;
+
+function lookup() {
+  if (!query.value.replace(/\D/g, '')) { lookupError.value = 'Enter the 8-digit number shown under the customer’s code.'; return; }
+  if (!findCard(query.value)) { lookupError.value = 'No card found with that number. Check the digits and try again.'; return; }
+  lookupError.value = '';
+  reset();
   loaded.value = true;
-  notice.value = '';
-  confirming.value = false;
 }
-function snapshot() { previous = JSON.parse(JSON.stringify(memberCard.value)) as NonNullable<typeof memberCard.value>; }
+function reset() { changed.value = false; previous = null; confirming.value = false; notice.value = ''; }
+function snapshot() { previous = JSON.parse(JSON.stringify(memberCard.value)) as MemberCard; }
 function stamp() {
   if (changed.value) return;
   snapshot();
-  if (addStamp()) { changed.value = true; notice.value = memberCard.value?.marks === 3 ? 'Stamp added. This card is ready for a free gift.' : 'Stamp added to the card.'; }
+  if (addStamp()) { changed.value = true; notice.value = memberCard.value?.marks === STAMP_TARGET ? 'Stamp added. This card now has a free gift ready.' : 'Stamp added.'; }
 }
 function redeem() {
   snapshot();
-  if (redeemGift()) { changed.value = true; confirming.value = false; notice.value = 'Gift redeemed. A new card is ready to collect stamps.'; }
+  if (redeemGift()) { changed.value = true; confirming.value = false; notice.value = 'Gift redeemed. Their new card starts at zero.'; }
 }
 function undo() {
-  if (previous) undoChange(previous);
-  previous = null;
-  changed.value = false;
-  notice.value = 'Change undone. The previous stamp balance has been restored.';
+  if (previous) restoreCard(previous);
+  reset();
+  notice.value = 'Undone. The card is back to how it was.';
 }
-function nextCheckout() { loaded.value = false; changed.value = false; previous = null; confirming.value = false; notice.value = ''; }
+function nextCustomer() {
+  reset();
+  loaded.value = false;
+  query.value = '';
+  lookupError.value = '';
+  if (route.query.card) void router.replace({ query: {} });
+}
 </script>
+
 <template>
-  <div><SiteHeader staff action-href="/card/" action-label="Customer card" />
-    <main id="main-content" class="dashboard-shell staff-shell">
-      <div class="page-heading"><div><p class="eyebrow">STAFF CHECKOUT</p><h1>Customer rewards</h1><p class="page-description">Check the customer’s card, then add a stamp or redeem their gift.</p></div><span class="pill"><ShieldCheck :size="16" /> Staff demo</span></div>
-      <div class="staff-grid" :class="{ 'has-card': card }">
-        <section class="staff-lookup panel"><span class="step-label">01 · FIND THE CARD</span><h2>Open a customer card</h2><div class="scan-area"><span class="scan-corners"><ScanLine :size="48" :stroke-width="1.3" /></span><h3>Start with a demo card</h3><p>{{ memberCard ? 'Use ' + memberCard.name + '’s card from this tab.' : 'An example card starts with 1 of 3 stamps.' }}</p><button class="primary-action full-width" :disabled="loaded" @click="openCard">{{ loaded ? 'Card opened' : memberCard ? 'Open card from this tab' : 'Load example card' }}<Check v-if="loaded" :size="18" /><ArrowRight v-else :size="18" /></button></div><p class="form-note">In the live service, the customer’s code will identify their card. This demo does not use your camera.</p><RouterLink to="/card/" class="text-action">View customer card <ArrowRight :size="16" /></RouterLink></section>
-        <section class="staff-actions panel"><span class="step-label">02 · COMPLETE THE CHECKOUT</span>
-          <template v-if="card"><div class="customer-heading"><div><p class="small-label">CUSTOMER</p><h2>{{ card.name }}</h2></div><span class="pill" :class="{ 'success-pill': card.marks === 3 }">{{ card.marks }} of 3 stamps</span></div>
-            <div class="staff-progress" role="img" :aria-label="card.marks + ' of 3 stamps'"><span v-for="index in 3" :key="index" aria-hidden="true" :class="{ collected: index <= card.marks }"><Check v-if="index <= card.marks" :size="25" /><Gift v-else-if="index === 3" :size="25" /><span v-else>{{ index }}</span></span></div>
-            <div v-if="confirming" class="redeem-confirm"><h3>Redeem this free gift?</h3><p>Confirm the customer has chosen an available gift. This uses all 3 stamps and starts a new card.</p><button class="primary-action full-width" @click="redeem">Confirm gift redemption <Gift :size="18" /></button><button class="secondary-action full-width" @click="confirming = false">Keep the stamps</button></div>
-            <template v-else-if="!changed"><h3>{{ card.marks === 3 ? 'Free gift available' : 'Ready to add a stamp' }}</h3><p class="page-description">{{ card.marks === 3 ? 'Ask the customer to choose from the gifts available in store.' : 'Confirm this purchase earns a stamp before continuing.' }}</p><button v-if="card.marks < 3" class="primary-action full-width" @click="stamp">Add 1 stamp <Check :size="18" /></button><button v-else class="primary-action full-width" @click="confirming = true">Redeem free gift <Gift :size="18" /></button></template>
-            <div v-if="notice && !confirming" class="success-notice" role="status"><Check :size="19" /><span>{{ notice }}</span></div>
-            <button v-if="changed && !confirming" class="undo-action" @click="undo"><RotateCcw :size="16" /> Undo last change</button>
-            <button v-if="changed && card.marks === 3 && !confirming" class="primary-action full-width" @click="confirming = true">Redeem free gift <Gift :size="18" /></button>
-            <button v-if="!confirming" class="secondary-action full-width" @click="nextCheckout">{{ changed ? 'Next checkout' : 'Close card' }}<ArrowRight :size="17" /></button>
-          </template>
-          <div v-else class="staff-empty"><span class="icon-tile"><Gift :size="28" /></span><h2>No card open yet</h2><p>Open a card to see its stamp balance and available actions.</p><span class="small-label">3 STAMPS = 1 FREE GIFT</span></div>
+  <div class="page-shell staff-shell">
+    <SiteHeader staff />
+    <main id="main-content" class="container staff">
+      <header class="staff-head">
+        <p class="kicker">Checkout</p>
+        <h1 class="headline">{{ card ? 'Customer card' : 'Find a customer card' }}</h1>
+      </header>
+
+      <div class="staff-stack">
+        <section class="panel lookup" aria-labelledby="lookup-title">
+          <h2 id="lookup-title" class="panel-title">Look up a card</h2>
+          <p class="panel-sub">Scanning the customer’s code opens their card here. Or type the number printed under it.</p>
+          <form class="lookup-form" novalidate @submit.prevent="lookup">
+            <label for="card-number" class="field-label">Card number</label>
+            <div class="lookup-row">
+              <input
+                id="card-number" v-model="query" class="input input-mono" inputmode="numeric" autocomplete="off" placeholder="0000 0000" maxlength="12"
+                :aria-invalid="!!lookupError" :aria-describedby="lookupError ? 'lookup-error' : undefined" @input="lookupError = ''"
+              />
+              <button class="btn btn-primary"><Search :size="17" aria-hidden="true" /> Find</button>
+            </div>
+            <p v-if="lookupError" id="lookup-error" class="field-error" role="alert">{{ lookupError }}</p>
+          </form>
+          <div class="scan-hint"><ScanLine :size="20" aria-hidden="true" /><span>Use your phone camera on the customer’s code</span></div>
+        </section>
+
+        <section v-if="card" class="panel customer" aria-labelledby="customer-name">
+          <div class="customer-head">
+            <span class="avatar" aria-hidden="true">{{ initial }}</span>
+            <div class="customer-id">
+              <h2 id="customer-name">{{ card.name }}</h2>
+              <p>Card {{ formatCardNumber(card.number) }}</p>
+            </div>
+            <span class="badge" :class="{ 'badge-gold': card.marks === STAMP_TARGET }">{{ card.marks === STAMP_TARGET ? 'Gift ready' : `${card.marks} of ${STAMP_TARGET}` }}</span>
+          </div>
+
+          <ol class="tracker" :aria-label="`${card.marks} of ${STAMP_TARGET} stamps`">
+            <li v-for="i in STAMP_TARGET" :key="i" :class="{ 'is-on': i <= card.marks, 'is-gift': i === STAMP_TARGET }">
+              <span class="tracker-dot" aria-hidden="true"><Gift v-if="i === STAMP_TARGET" :size="26" :stroke-width="1.75" /><Check v-else-if="i <= card.marks" :size="26" :stroke-width="2.25" /><span v-else>{{ i }}</span></span>
+              <span class="tracker-label">{{ i === STAMP_TARGET ? 'Gift' : `Stamp ${i}` }}</span>
+            </li>
+          </ol>
+
+          <div class="staff-action">
+            <div v-if="confirming" class="confirm" role="group" aria-labelledby="confirm-title">
+              <h3 id="confirm-title">Hand over a free gift?</h3>
+              <p>Make sure the customer has picked a gift. This uses all three stamps and starts a new card.</p>
+              <div class="confirm-actions">
+                <button class="btn btn-ghost" @click="confirming = false">Cancel</button>
+                <button class="btn btn-brand" @click="redeem"><Gift :size="17" aria-hidden="true" /> Confirm redemption</button>
+              </div>
+            </div>
+            <template v-else>
+              <div v-if="notice" class="notice" role="status">
+                <Check :size="18" aria-hidden="true" /><span>{{ notice }}</span>
+                <button v-if="changed" class="notice-undo" @click="undo"><RotateCcw :size="14" aria-hidden="true" /> Undo</button>
+              </div>
+              <template v-if="card.marks === STAMP_TARGET">
+                <p v-if="!notice" class="action-hint">Ask the customer to choose from the gifts in store.</p>
+                <button class="btn btn-brand btn-lg btn-block" @click="confirming = true"><Gift :size="18" aria-hidden="true" /> Redeem free gift</button>
+              </template>
+              <template v-else-if="!changed">
+                <p class="action-hint">Confirm the purchase qualifies, then add one stamp.</p>
+                <button class="btn btn-primary btn-lg btn-block" @click="stamp"><Stamp :size="18" aria-hidden="true" /> Add stamp</button>
+              </template>
+            </template>
+          </div>
+
+          <button v-if="!confirming" class="btn btn-ghost btn-block next-btn" @click="nextCustomer">
+            {{ changed ? 'Done · next customer' : 'Close card' }}<ArrowRight :size="17" aria-hidden="true" />
+          </button>
         </section>
       </div>
     </main>
