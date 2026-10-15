@@ -7,10 +7,10 @@ const year = new Date().getFullYear();
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <BrandMark :size="40" />
+        <BrandMark :size="32" />
         <div>
           <p class="footer-name">M Souq Rewards</p>
-          <p class="footer-note">Three stamps. One free gift. See you at the till.</p>
+          <p class="footer-note">Collect 3 stamps, get a free gift.</p>
         </div>
       </div>
       <nav class="footer-links" aria-label="Footer">

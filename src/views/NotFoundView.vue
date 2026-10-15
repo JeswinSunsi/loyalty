@@ -8,11 +8,15 @@ import SiteFooter from '../components/SiteFooter.vue';
   <div class="page-shell">
     <SiteHeader />
     <main id="main-content" class="page-main">
-      <div class="container lost">
-        <div class="lost-arch" aria-hidden="true"><span>404</span></div>
-        <h1 class="h1">This stall is closed.</h1>
-        <p class="lede">The page you’re looking for isn’t here. The link may be old or mistyped.</p>
-        <RouterLink to="/" class="btn btn-primary btn-lg">Back to the rewards <ArrowRight :size="20" aria-hidden="true" /></RouterLink>
+      <div class="container">
+        <section class="panel empty-state">
+          <p class="error-code">Error 404</p>
+          <h1 class="h1">We can’t find that page</h1>
+          <p class="lede">The link may be old or mistyped. Let’s get you back to your rewards.</p>
+          <div class="empty-actions">
+            <RouterLink to="/" class="btn btn-primary btn-lg">Go to the home page <ArrowRight :size="20" aria-hidden="true" /></RouterLink>
+          </div>
+        </section>
       </div>
     </main>
     <SiteFooter />

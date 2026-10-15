@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import { ArrowDown, ArrowRight, Headphones, PenTool, Plus, Sparkles, Watch } from '@lucide/vue';
+import { ArrowRight, Check, ChevronDown, Gift, Headphones, PenTool, QrCode, ShoppingBag, Sparkles, Watch } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
-import ArchStage from '../components/ArchStage.vue';
-import StarMark from '../components/StarMark.vue';
 import { memberCard } from '../store';
 
 const steps = [
-  { title: 'Shop with us', text: 'Buy as you normally would. Ask the team if your purchase earns a stamp.' },
-  { title: 'Show your card', text: 'Open your card on your phone at the till. We scan it and add a stamp.' },
-  { title: 'Pick your gift', text: 'Three stamps fills the card. Choose a free gift from the shelf, right there.' },
+  { icon: ShoppingBag, title: 'Shop at M Souq', text: 'Buy as you normally would. Ask the team if your purchase earns a stamp.' },
+  { icon: QrCode, title: 'Show your card', text: 'Open your card on your phone at the till. The cashier scans it and adds one stamp.' },
+  { icon: Gift, title: 'Get a free gift', text: 'When you have 3 stamps, choose a free gift from the gift shelf.' },
 ];
 const gifts = [
   { icon: PenTool, name: 'Cleaning pen', note: 'For screens, lenses and earbuds' },
@@ -35,37 +33,40 @@ const faqs = [
       <section class="hero">
         <div class="container hero-grid">
           <div class="hero-copy">
-            <p class="hero-tag"><StarMark /> M Souq Rewards</p>
-            <h1 class="h-display">Three stamps.<br /><span class="hl">One free gift.</span></h1>
-            <p class="lede lede-lg">Collect a stamp each time you shop with us. Fill your card, then pick a free gift from our shelf.</p>
+            <p class="kicker">M Souq Rewards</p>
+            <h1 class="h-display">Collect 3 stamps.<br /><em>Get a free gift.</em></h1>
+            <p class="lede lede-lg">Get one stamp each time you shop with us. When your card is full, choose a free gift in store.</p>
             <div class="hero-actions">
               <RouterLink :to="memberCard ? '/card/' : '/join/'" class="btn btn-primary btn-lg">
                 {{ memberCard ? 'Open my card' : 'Get your free card' }} <ArrowRight :size="20" aria-hidden="true" />
               </RouterLink>
-              <RouterLink :to="{ path: '/', hash: '#how-it-works' }" class="link-arrow">See how it works <ArrowDown :size="18" aria-hidden="true" /></RouterLink>
+              <RouterLink :to="{ path: '/', hash: '#how-it-works' }" class="btn btn-secondary btn-lg">How it works</RouterLink>
             </div>
-            <ul class="hero-fine">
-              <li><StarMark /> Free to join</li>
-              <li><StarMark /> No app needed</li>
-              <li><StarMark /> Ready in a minute</li>
+            <ul class="trust-list">
+              <li><Check :size="20" aria-hidden="true" /> Free to join</li>
+              <li><Check :size="20" aria-hidden="true" /> No app to download</li>
+              <li><Check :size="20" aria-hidden="true" /> No password needed</li>
             </ul>
           </div>
           <figure class="hero-visual">
-            <ArchStage><LoyaltyCard name="Layla" number="20250316" :marks="2" /></ArchStage>
-            <figcaption>Two stamps in. One more and the gift is hers.</figcaption>
+            <LoyaltyCard name="Layla" number="20250316" :marks="2" />
+            <figcaption>Example card: 2 stamps collected, 1 more for a free gift.</figcaption>
           </figure>
         </div>
       </section>
 
-      <section id="how-it-works" class="section section-paper" aria-labelledby="how-heading">
+      <section id="how-it-works" class="section" aria-labelledby="how-heading">
         <div class="container">
           <div class="section-head">
             <h2 id="how-heading" class="h2">How it works</h2>
-            <p class="lede">No points to count. Just three visits.</p>
+            <p class="lede">Three simple steps. No points to count.</p>
           </div>
           <ol class="steps">
             <li v-for="(step, i) in steps" :key="step.title" class="step">
-              <span class="step-arch" aria-hidden="true">{{ i + 1 }}</span>
+              <div class="step-top">
+                <span class="step-num" aria-hidden="true">{{ i + 1 }}</span>
+                <component :is="step.icon" class="step-icon" :size="26" :stroke-width="1.6" aria-hidden="true" />
+              </div>
               <h3 class="h3"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
               <p>{{ step.text }}</p>
             </li>
@@ -73,34 +74,32 @@ const faqs = [
         </div>
       </section>
 
-      <section id="gifts" class="section" aria-labelledby="gift-heading">
+      <section id="gifts" class="section section-alt" aria-labelledby="gift-heading">
         <div class="container">
           <div class="section-head">
-            <h2 id="gift-heading" class="h2">On the gift shelf</h2>
-            <p class="lede">Fill your card and choose one, free. The shelf changes with the season, so ask in store to see what’s there today.</p>
+            <h2 id="gift-heading" class="h2">Gifts you can choose</h2>
+            <p class="lede">Fill your card with 3 stamps and choose one, free. The selection changes with the season, so ask in store to see today’s gifts.</p>
           </div>
-          <ul class="shelf">
+          <ul class="gift-grid">
             <li v-for="gift in gifts" :key="gift.name" class="gift">
-              <div class="niche">
-                <component :is="gift.icon" class="niche-icon" :size="44" :stroke-width="1.6" aria-hidden="true" />
-                <span class="price-tag">Free</span>
-              </div>
+              <span class="gift-icon"><component :is="gift.icon" :size="30" aria-hidden="true" /></span>
               <h3 class="h3">{{ gift.name }}</h3>
               <p>{{ gift.note }}</p>
+              <span class="badge badge-accent">Free gift</span>
             </li>
           </ul>
         </div>
       </section>
 
-      <section id="questions" class="section section-sand" aria-labelledby="faq-heading">
+      <section id="questions" class="section" aria-labelledby="faq-heading">
         <div class="container faq-layout">
           <div class="section-head">
-            <h2 id="faq-heading" class="h2">Good to know</h2>
-            <p class="lede">Anything else? Ask us at the till. We’re happy to help.</p>
+            <h2 id="faq-heading" class="h2">Common questions</h2>
+            <p class="lede">Still unsure? Our team at the till is happy to help.</p>
           </div>
           <div class="faq">
             <details v-for="item in faqs" :key="item.q">
-              <summary>{{ item.q }}<span class="faq-icon"><Plus :size="20" aria-hidden="true" /></span></summary>
+              <summary>{{ item.q }}<ChevronDown class="faq-icon" :size="24" aria-hidden="true" /></summary>
               <p>{{ item.a }}</p>
             </details>
           </div>
@@ -109,17 +108,14 @@ const faqs = [
 
       <section class="section section-tight">
         <div class="container">
-          <div class="stall">
-            <div class="awning awning-gold" aria-hidden="true" />
-            <div class="stall-body">
-              <div>
-                <h2 class="h2">Your first stamp is one visit away.</h2>
-                <p>Make your card now so it’s ready at the till. All we need is your name.</p>
-              </div>
-              <RouterLink :to="memberCard ? '/card/' : '/join/'" class="btn btn-gold btn-lg">
-                {{ memberCard ? 'Open my card' : 'Get your free card' }} <ArrowRight :size="20" aria-hidden="true" />
-              </RouterLink>
+          <div class="cta-band">
+            <div>
+              <h2 class="h2">Start collecting today</h2>
+              <p>It takes less than a minute. All you need is your name.</p>
             </div>
+            <RouterLink :to="memberCard ? '/card/' : '/join/'" class="btn btn-light btn-lg">
+              {{ memberCard ? 'Open my card' : 'Get your free card' }} <ArrowRight :size="20" aria-hidden="true" />
+            </RouterLink>
           </div>
         </div>
       </section>

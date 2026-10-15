@@ -2,10 +2,9 @@
 import { computed } from 'vue';
 import { Check, Gift } from '@lucide/vue';
 import BrandMark from './BrandMark.vue';
-import StarMark from './StarMark.vue';
 import { formatCardNumber, STAMP_TARGET } from '../store';
 
-// Peacock-teal card stock with a star-tile ground. Each stamp lands as a terracotta star; the last one is the marigold gift.
+// A plain membership card, like the ones people already carry: brand, stamps with labels, name and number.
 const props = withDefaults(defineProps<{ name: string; marks: number; number?: string }>(), { number: '' });
 const marks = computed(() => Math.max(0, Math.min(STAMP_TARGET, props.marks)));
 const complete = computed(() => marks.value === STAMP_TARGET);
@@ -22,10 +21,9 @@ const label = computed(() => `Rewards card for ${props.name}: ${marks.value} of 
       <ol class="lc-stamps">
         <li v-for="i in STAMP_TARGET" :key="i" :class="{ 'is-on': i <= marks, 'is-gift': i === STAMP_TARGET }">
           <span class="lc-dot">
-            <StarMark v-if="i <= marks" class="lc-star" />
-            <Gift v-if="i === STAMP_TARGET" class="lc-glyph" :stroke-width="2.2" />
-            <Check v-else-if="i <= marks" class="lc-glyph" :stroke-width="3" />
-            <span v-else class="lc-num">{{ i }}</span>
+            <Gift v-if="i === STAMP_TARGET" :stroke-width="2.2" />
+            <Check v-else-if="i <= marks" :stroke-width="3" />
+            <template v-else>{{ i }}</template>
           </span>
           <span class="lc-dot-label">{{ i === STAMP_TARGET ? 'Gift' : `Stamp ${i}` }}</span>
         </li>
