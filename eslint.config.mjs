@@ -1,11 +1,17 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import js from '@eslint/js';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import vue from 'eslint-plugin-vue';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  globalIgnores([".next/**", "out/**", "dist/**", ".vinext/**", "next-env.d.ts"]),
+export default defineConfig([
+  globalIgnores(['dist/**', 'coverage/**', '.npm-cache/**', '.wrangler/**']),
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...vue.configs['flat/essential'],
+  { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
+  {
+    files: ['**/*.vue'],
+    languageOptions: { parserOptions: { parser: tseslint.parser } },
+  },
 ]);
-
-export default eslintConfig;
