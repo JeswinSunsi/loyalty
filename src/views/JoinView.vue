@@ -12,7 +12,7 @@ const error = ref('');
 function submit() {
   if (!name.value.trim()) { error.value = 'Please enter the name you’d like on your card.'; return; }
   createCard(name.value);
-  void router.push({ path: '/card/', query: { welcome: '1' } });
+  void router.push('/card/');
 }
 </script>
 <template>

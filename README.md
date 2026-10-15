@@ -6,7 +6,7 @@ A Vue 3 / TypeScript / Vite loyalty card site. Customers collect **3 stamps for 
 
 - `/`: introduction, how it works, gifts, questions
 - `/join/`: create a card with just a name
-- `/card/`: the customer's card, a progress bar ("1 more stamp to get your free gift"), recent activity, and a **Show my code** button that opens the checkout QR code in a dialog
+- `/card/`: the member's card on the green stage with a stamp meter and a **Show my code** button (opens the checkout QR code in a dialog), then an activity timeline and the gift shelf. Arriving from another page plays a short curtain: a green circle opens from the tap and the gold seal turns while the card page loads.
 - `/staff/`: staff checkout. Look up a card by scanning its code or typing its 8-digit number, add one stamp per checkout, undo the last change, and confirm gift redemption. Redeeming uses all three stamps and starts the next card at zero.
 
 `/login/` redirects to `/card/` and `/staff/login/` redirects to `/staff/`.

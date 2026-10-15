@@ -1,22 +1,17 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import { ArrowRight, Check, ChevronDown, Gift, Headphones, PenTool, QrCode, ShoppingBag, Sparkles, Watch } from '@lucide/vue';
+import { ArrowRight, Check, ChevronDown, Gift, QrCode, ShoppingBag } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
 import SealRing from '../components/SealRing.vue';
 import { memberCard } from '../store';
+import { gifts } from '../gifts';
 
 const steps = [
   { icon: ShoppingBag, title: 'Shop at M Souq', text: 'Buy as you normally would. Ask the team if your purchase earns a stamp.' },
   { icon: QrCode, title: 'Show your card', text: 'Open your card on your phone at the till. The cashier scans it and adds one stamp.' },
   { icon: Gift, title: 'Get a free gift', text: 'When you have 3 stamps, choose a free gift from the gift shelf.' },
-];
-const gifts = [
-  { icon: PenTool, name: 'Cleaning pen', note: 'For screens, lenses and earbuds' },
-  { icon: Watch, name: 'Smart band', note: 'Counts steps, sleep and heart rate' },
-  { icon: Headphones, name: 'Earbuds', note: 'Wireless, with a charging case' },
-  { icon: Sparkles, name: 'And more', note: 'New gifts arrive each season' },
 ];
 const faqs = [
   { q: 'Which purchases earn a stamp?', a: 'Ask the M Souq team at checkout. They’ll confirm whether your purchase earns a stamp before adding it to your card.' },

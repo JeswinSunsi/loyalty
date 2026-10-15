@@ -157,9 +157,9 @@ main:focus { outline: none; }
 .lc-dot { display: grid; place-items: center; width: 14.5cqi; aspect-ratio: 1; border: 1.5px solid rgb(255 255 255 / .5); border-radius: 50%; font-family: var(--font-display); font-size: max(14px, 4.6cqi); font-weight: 600; }
 .lc-dot svg { width: 46%; height: 46%; }
 .lc-stamps li.is-on .lc-dot { border-color: transparent; background: var(--foil); color: var(--brand-dark); animation: stamp-in .6s var(--ease-spring) both; }
-.lc-stamps li:nth-child(1).is-on .lc-dot { animation-delay: .7s; }
-.lc-stamps li:nth-child(2).is-on .lc-dot { animation-delay: .95s; }
-.lc-stamps li:nth-child(3).is-on .lc-dot { animation-delay: 1.2s; }
+.lc-stamps li:nth-child(1).is-on .lc-dot { animation-delay: calc(var(--enter, 0s) + .7s); }
+.lc-stamps li:nth-child(2).is-on .lc-dot { animation-delay: calc(var(--enter, 0s) + .95s); }
+.lc-stamps li:nth-child(3).is-on .lc-dot { animation-delay: calc(var(--enter, 0s) + 1.2s); }
 .lc-stamps li.is-gift .lc-dot { border-color: var(--gold); color: #ead08a; }
 .lc-stamps li.is-gift.is-on .lc-dot { color: var(--brand-dark); }
 .lc-dot-label { font-size: max(11px, 3.2cqi); font-weight: 600; opacity: .88; }
@@ -188,7 +188,7 @@ main:focus { outline: none; }
 .hero-ring { position: absolute; top: 50%; left: 50%; width: min(104%, 520px); aspect-ratio: 1; color: rgb(234 208 138 / .55); translate: -50% -50%; animation: spin 80s linear infinite, fade-in 1.4s .3s both; }
 .hero-card { position: relative; width: 100%; animation: deal 1s .25s var(--ease-out) both; }
 .hero-card .lc-wrap { animation: float 7s 1.3s ease-in-out infinite; }
-.hero-card:hover .lc, .card-grid .panel:hover .lc { transform: perspective(1000px) rotateY(-7deg) rotateX(4deg); }
+.hero-card:hover .lc { transform: perspective(1000px) rotateY(-7deg) rotateX(4deg); }
 .hero .hero-visual figcaption { margin-top: 4px; color: rgb(255 255 255 / .72); }
 .hero-grid { display: grid; gap: 28px; padding-block: 52px 56px; }
 .hero-actions { display: grid; gap: 12px; margin-top: 30px; }
@@ -284,34 +284,91 @@ main:focus { outline: none; }
 .preview-note svg { flex-shrink: 0; color: var(--gold-ink); }
 
 /* ───────────── My card ───────────── */
-.card-grid { display: grid; gap: 20px; align-items: start; }
-.card-side { display: grid; gap: 20px; }
-.code-btn { margin-top: 24px; }
-.panel-stage { border-color: transparent; color: #fff; background: radial-gradient(70% 60% at 70% 30%, rgb(201 162 74 / .24), transparent 70%), radial-gradient(60% 80% at 0% 100%, rgb(31 106 87 / .55), transparent 70%), var(--brand-dark); }
-.panel-stage .help-text { color: rgb(255 255 255 / .78); }
-.progress-count { margin-top: 10px; font-size: 18px; }
-.progress-count strong { font-family: var(--font-display); font-size: 40px; font-weight: 600; line-height: 1; }
-.progress { height: 12px; margin-top: 14px; overflow: hidden; border-radius: 999px; background: var(--line); }
-.progress-fill { display: block; height: 100%; border-radius: inherit; background: var(--brand); transform-origin: left; transition: width .6s var(--ease-out); animation: grow 1.3s .5s var(--ease-out) both; }
-.progress-text { display: flex; align-items: center; gap: 8px; margin: 14px 0 6px; font-weight: 700; }
-.panel-accent { border-color: #e6cf98; background: var(--gold-tint); }
-.panel-accent .progress { background: rgb(122 90 18 / .15); }
-.panel-accent .progress-fill { background: var(--foil); }
-.panel-accent .progress-text svg { color: var(--gold-ink); }
+/*
+  The same green stage as the front page, telling the member where they stand: headline, card, stamp meter, then the
+  code button. Phones read top to bottom (headline, card, meter, actions); wide screens put the card on the right.
+  --enter pushes the whole entrance back while the card curtain is still lifting.
+*/
+.member-hero { --enter: 0s; }
+.member-hero.is-arriving { --enter: .45s; }
+.member-hero.is-ready { background: radial-gradient(50% 75% at 78% 45%, rgb(234 208 138 / .38), transparent 70%), radial-gradient(60% 80% at 0% 100%, rgb(31 106 87 / .55), transparent 70%), var(--brand-dark); }
+.member-grid { display: grid; grid-template-areas: "note" "head" "visual" "body"; gap: 20px; padding-block: 44px 56px; }
+.hero-note { grid-area: note; display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border: 1px solid rgb(234 208 138 / .4); border-radius: var(--radius); background: rgb(255 255 255 / .06); font-size: 16px; }
+.hero-note svg { flex-shrink: 0; margin-top: 2px; color: var(--gold); }
+.member-head { grid-area: head; }
+.member-hero .h-display { font-size: clamp(38px, 5.4vw, 60px); }
+.member-visual { grid-area: visual; width: 100%; max-width: 460px; margin: 0 auto; }
+.member-visual figcaption { margin-top: 2px; color: rgb(255 255 255 / .7); font-size: 15px; letter-spacing: .02em; text-align: center; }
+.member-body { grid-area: body; display: grid; gap: 22px; min-width: 0; }
+.member-body .lede { margin-top: 0; }
+.member-hero .hero-card { animation-delay: calc(var(--enter) + .2s); }
+.member-head > *, .member-body > *, .member-visual figcaption { animation: rise .8s var(--ease-out) both; }
+.member-head > :nth-child(1) { animation-delay: calc(var(--enter) + .05s); }
+.member-head > :nth-child(2) { animation-delay: calc(var(--enter) + .14s); }
+.member-body > :nth-child(1) { animation-delay: calc(var(--enter) + .4s); }
+.member-body > :nth-child(2) { animation-delay: calc(var(--enter) + .5s); }
+.member-body > :nth-child(3) { animation-delay: calc(var(--enter) + .6s); }
+.member-visual figcaption { animation-delay: calc(var(--enter) + 1s); }
 
-.activity { display: grid; margin: 12px 0 0; padding: 0; list-style: none; }
-.activity li { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
-.activity li + li { border-top: 1px solid var(--line); }
-.activity-icon { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--bg); color: var(--muted); }
-.activity li.is-stamp .activity-icon { background: var(--brand-tint); color: var(--brand); }
-.activity li.is-redeemed .activity-icon { background: var(--gold-tint); color: var(--gold-ink); }
-.activity-text { display: flex; flex-direction: column; min-width: 0; }
-.activity-title { font-weight: 700; }
-.activity time { color: var(--muted); font-size: 16px; }
+/* Stamp meter: three segments, filled in gold foil one after another. */
+.meter { padding-top: 20px; border-top: 1px solid rgb(234 208 138 / .25); }
+.meter-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.meter-count { color: rgb(255 255 255 / .85); font-size: 18px; }
+.meter-count strong { margin-right: 4px; color: #fff; font-family: var(--font-display); font-size: 48px; font-weight: 600; line-height: 1; }
+.meter-note { color: #ead08a; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.meter-track { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+.meter-track li { display: grid; gap: 8px; }
+.meter-fill { position: relative; display: block; height: 10px; overflow: hidden; border-radius: 999px; background: rgb(255 255 255 / .14); }
+.meter-fill::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--foil); transform: scaleX(0); transform-origin: left; }
+.meter-track li.is-on .meter-fill::after { transform: scaleX(1); animation: grow .7s var(--ease-out) both; }
+.meter-track li:nth-child(1) .meter-fill::after { animation-delay: calc(var(--enter) + .8s); }
+.meter-track li:nth-child(2) .meter-fill::after { animation-delay: calc(var(--enter) + 1.05s); }
+.meter-track li:nth-child(3) .meter-fill::after { animation-delay: calc(var(--enter) + 1.3s); }
+.meter-label { color: rgb(255 255 255 / .66); font-size: 14px; font-weight: 600; }
+.meter-track li.is-on .meter-label { color: #fff; }
+.meter-track li.is-gift .meter-label { color: #ead08a; }
+.member-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.member-actions .btn { flex: 1 1 220px; }
+.member-hint { color: rgb(255 255 255 / .75); font-size: 16px; }
+
+/* Below the stage: a timeline of the card's life, and the gift shelf. */
+.member-more-grid { display: grid; gap: 48px; }
+.timeline { position: relative; display: grid; margin: 28px 0 0; padding: 0; list-style: none; }
+.timeline::before { content: ""; position: absolute; top: 24px; bottom: 24px; left: 19px; width: 2px; background: linear-gradient(var(--gold), var(--line)); }
+.timeline li { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 18px; padding-block: 12px; }
+.timeline-dot { position: relative; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line-2); border-radius: 50%; background: var(--surface); color: var(--muted); }
+.timeline li.is-stamp .timeline-dot { border-color: var(--brand); background: var(--brand); color: #fff; }
+.timeline li.is-redeemed .timeline-dot { border-color: transparent; background: var(--foil); color: var(--brand-dark); }
+.timeline li:first-child .timeline-dot::after { content: ""; position: absolute; inset: -6px; border: 2px solid var(--gold); border-radius: 50%; animation: pulse 2.6s ease-out infinite; }
+.timeline-title { font-size: 18px; font-weight: 700; }
+.timeline time { color: var(--muted); font-size: 16px; }
+.timeline-foot { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.shelf-block { padding: 28px 24px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.mini-shelf { display: grid; margin: 22px 0 14px; padding: 0; list-style: none; }
+.mini-shelf li { display: flex; align-items: center; gap: 14px; padding-block: 12px; }
+.mini-shelf li + li { border-top: 1px solid var(--line); }
+.mini-icon { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: var(--brand-tint); color: var(--brand); transition: transform .5s var(--ease-spring), background-color .3s; }
+.mini-shelf li:hover .mini-icon { background: var(--foil); color: var(--brand-dark); transform: rotate(-12deg) scale(1.08); }
+.mini-text { display: flex; flex-direction: column; min-width: 0; }
+.mini-text strong { font-size: 17px; }
+.mini-text span { color: var(--muted); font-size: 15px; }
+
+/* Card curtain: opens as a circle from the tap, lifts away once the card page is drawn. */
+.ct { position: fixed; inset: 0; z-index: 100; }
+.ct.is-reveal { pointer-events: none; }
+.ct-panel { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 24px; color: #fff; background: radial-gradient(45% 45% at 50% 45%, rgb(201 162 74 / .3), transparent 70%), var(--brand-dark); }
+.is-cover .ct-panel { animation: ct-open .7s cubic-bezier(.7, 0, .2, 1) both; }
+.is-reveal .ct-panel { animation: ct-lift .7s cubic-bezier(.65, 0, .3, 1) both; }
+.ct-seal { position: relative; display: grid; place-items: center; width: 210px; height: 210px; }
+.ct-ring { position: absolute; inset: 0; width: 100%; height: 100%; color: rgb(234 208 138 / .85); animation: spin 7s linear infinite; }
+.ct-mark { --mark-bg: #fff; --mark-fg: var(--brand); }
+.is-cover .ct-seal { animation: ct-seal .7s .2s var(--ease-spring) both; }
+.ct-label { color: #ead08a; font-size: 14px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.is-cover .ct-label { animation: rise .5s .4s var(--ease-out) both; }
+.is-reveal :is(.ct-seal, .ct-label) { animation: ct-away .35s ease-in both; }
 
 .empty-state { max-width: 640px; margin-inline: auto; padding: 40px 24px; text-align: center; }
 .empty-state .kicker { justify-content: center; }
-.empty-icon { display: inline-grid; place-items: center; width: 72px; height: 72px; margin-bottom: 20px; border-radius: 50%; background: var(--brand-tint); color: var(--brand); }
 .empty-actions { display: grid; gap: 12px; margin-top: 28px; }
 .error-code { margin-bottom: 8px; color: var(--gold-ink); font-family: var(--font-display); font-size: 20px; font-weight: 600; }
 
@@ -385,6 +442,11 @@ main:focus { outline: none; }
 @keyframes card-shine { 0% { transform: translateX(-130%); } 30%, 100% { transform: translateX(130%); } }
 @keyframes glow-drift { to { background-position: 100% 0, 0 0; } }
 @keyframes grow { from { transform: scaleX(0); } }
+@keyframes pulse { 0% { opacity: .9; transform: scale(.85); } 100% { opacity: 0; transform: scale(1.35); } }
+@keyframes ct-open { from { clip-path: circle(0% at var(--ox) var(--oy)); } to { clip-path: circle(150% at var(--ox) var(--oy)); } }
+@keyframes ct-lift { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 0 100% 0); } }
+@keyframes ct-seal { from { opacity: 0; transform: scale(.55) rotate(-50deg); } }
+@keyframes ct-away { to { opacity: 0; transform: translateY(-28px); } }
 @keyframes qr-in { from { opacity: 0; transform: scale(.9); filter: blur(4px); } }
 
 /* ───────────── Wider screens ───────────── */
@@ -408,7 +470,11 @@ main:focus { outline: none; }
   .gift { padding: 24px; }
   .faq-layout { grid-template-columns: .8fr 1.2fr; gap: 56px; align-items: start; }
   .join-grid { grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
-  .card-grid { grid-template-columns: 1.15fr .85fr; gap: 24px; }
+  .member-grid { grid-template-columns: 1.05fr .95fr; grid-template-areas: "note note" "head visual" "body visual"; align-items: end; column-gap: 64px; row-gap: 28px; padding-block: 72px 84px; }
+  .member-body { align-self: start; }
+  .member-visual { align-self: center; }
+  .member-more-grid { grid-template-columns: 1.1fr .9fr; gap: 72px; align-items: start; }
+  .shelf-block { padding: 32px; }
   .panel { padding: 28px; }
 }
 
