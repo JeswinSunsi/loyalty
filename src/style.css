@@ -368,6 +368,41 @@ main:focus { outline: none; }
 .member-hero.is-welcome .display { animation-delay: .08s; }
 .member-hero.is-welcome .hero-lede { animation-delay: .16s; }
 .member-card.is-new { animation: deal .8s .2s var(--ease-out) backwards; }
+/* Behind the card curtain: everything waits under the cover, then settles in top-down as the curtain sweeps away. */
+.member-hero.is-arriving .hero-inner > :is(.hero-kicker, .display, .hero-lede, .member-caption, .hero-cta) { animation: rise .6s .28s var(--ease-out) backwards; }
+.member-hero.is-arriving .display { animation-delay: .34s; }
+.member-hero.is-arriving .hero-lede { animation-delay: .4s; }
+.member-hero.is-arriving :is(.member-caption, .hero-cta) { animation-delay: .52s; }
+.member-card.is-arriving, .member-hero.is-arriving .empty-card { animation: deal .8s .4s var(--ease-out) backwards; }
+
+/* ───────────── Card curtain (plays on the way into the card page) ───────────── */
+.ct { position: fixed; inset: 0; z-index: 100; overflow: hidden; }
+.ct.is-reveal { pointer-events: none; }
+.ct-panel {
+  --zz: 18px;
+  position: absolute; inset: -18px 0; display: grid; place-items: center;
+  background: radial-gradient(55% 40% at 50% 46%, rgb(255 255 255 / .12), transparent 70%), var(--brand); color: #fff;
+  -webkit-mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--zz) 51% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--zz) 51% repeat-x;
+  mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--zz) 51% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--zz) 51% repeat-x;
+  will-change: transform;
+}
+.is-cover .ct-panel { animation: ct-in .5s cubic-bezier(.7, 0, .25, 1) both; }
+.is-reveal .ct-panel { animation: ct-out .6s cubic-bezier(.65, 0, .3, 1) both; }
+.ct-mark { position: relative; display: grid; justify-items: center; gap: 22px; }
+.ct-mark::before { content: ""; position: absolute; top: -14px; left: 50%; width: 160px; height: 160px; margin-left: -80px; border: 2px solid var(--gold); border-radius: 50%; opacity: 0; }
+.ct-stamp { width: 132px; height: 132px; color: #fff; transform: rotate(-10deg); }
+.is-cover .ct-stamp { animation: ct-press .38s .36s var(--ease-out) both; }
+.is-cover .ct-mark::before { animation: ct-ring .7s .6s ease-out forwards; }
+.ct-label { color: rgb(255 255 255 / .78); font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+.is-cover .ct-label { animation: rise .4s .5s var(--ease-out) both; }
+@keyframes ct-in { from { transform: translateY(100%); } }
+@keyframes ct-out { to { transform: translateY(-100%); } }
+@keyframes ct-press {
+  0% { opacity: 0; transform: rotate(-26deg) scale(1.8); }
+  60% { opacity: 1; transform: rotate(-8deg) scale(.93); }
+  100% { opacity: 1; transform: rotate(-10deg) scale(1); }
+}
+@keyframes ct-ring { 0% { opacity: .9; transform: scale(.82); } 100% { opacity: 0; transform: scale(1.25); } }
 
 .r-meta { display: grid; gap: 6px; margin: 0; }
 .r-meta div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
