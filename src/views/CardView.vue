@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { ArrowRight, CircleCheck, Gift, QrCode, Sparkles, Stamp, TriangleAlert } from '@lucide/vue';
+import { ArrowRight, Gift, QrCode, Sparkles, Stamp, TriangleAlert } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
+import ArchStage from '../components/ArchStage.vue';
+import StarMark from '../components/StarMark.vue';
 import CodeDialog from '../components/CodeDialog.vue';
 import { memberCard, STAMP_TARGET, storageAvailable, type ActivityKind } from '../store';
 import { qrShape } from '../qr';
@@ -19,7 +21,10 @@ const marks = computed(() => memberCard.value?.marks ?? 0);
 const remaining = computed(() => STAMP_TARGET - marks.value);
 const ready = computed(() => remaining.value === 0);
 const firstName = computed(() => memberCard.value?.name.split(' ')[0] ?? '');
-const progressText = computed(() => ready.value ? 'Your card is full. Your free gift is ready.'
+const headline = computed(() => ready.value ? 'Your gift is ready.'
+  : remaining.value === 1 ? 'One more stamp to go.'
+  : `${['', 'One', 'Two', 'Three'][remaining.value]} stamps to your gift.`);
+const progressText = computed(() => ready.value ? 'Your card is full. Show your code and pick a gift.'
   : remaining.value === 1 ? '1 more stamp to get your free gift.'
   : `${remaining.value} more stamps to get your free gift.`);
 
@@ -44,10 +49,10 @@ function when(at: string) {
     <SiteHeader />
     <main id="main-content" class="page-main">
       <div v-if="memberCard" class="container">
-        <div v-if="welcome" class="alert alert-success" role="status">
-          <CircleCheck :size="24" aria-hidden="true" />
+        <div v-if="welcome" class="alert alert-welcome" role="status">
+          <StarMark />
           <div>
-            <p class="alert-title">Your card is ready, {{ firstName }}!</p>
+            <p class="alert-title">Welcome to M Souq Rewards, {{ firstName }}!</p>
             <p>Next time you shop, press <strong>Show my code</strong> at the till to collect your first stamp.</p>
           </div>
         </div>
@@ -56,31 +61,26 @@ function when(at: string) {
           <p>This browser isn’t letting us save your card. Your stamps may not be here next time.</p>
         </div>
 
-        <header class="page-head">
-          <h1 class="h1">Hello, {{ firstName }}</h1>
-          <p class="lede">This is your M Souq rewards card.</p>
-        </header>
-
         <div class="card-grid">
-          <section class="panel" aria-label="Your card">
-            <LoyaltyCard :name="memberCard.name" :number="memberCard.number" :marks="memberCard.marks" />
+          <section class="card-main" aria-labelledby="card-title">
+            <p class="hello">Hello, {{ firstName }}</p>
+            <h1 id="card-title" class="h1" aria-live="polite">{{ headline }}</h1>
+            <ArchStage class="card-stage"><LoyaltyCard :name="memberCard.name" :number="memberCard.number" :marks="memberCard.marks" /></ArchStage>
             <button type="button" class="btn btn-primary btn-lg btn-block code-btn" @click="showCode = true">
               <QrCode :size="22" aria-hidden="true" /> Show my code
             </button>
-            <p class="help-text">Press this at the till. The cashier scans the code to add your stamp.</p>
+            <p class="help-text">Press this at the till. We scan the code and add your stamp.</p>
           </section>
 
           <div class="card-side">
-            <section class="panel" :class="{ 'panel-accent': ready }" aria-labelledby="progress-title">
+            <section class="panel" :class="{ 'panel-ready': ready }" aria-labelledby="progress-title">
               <h2 id="progress-title" class="h3">Your progress</h2>
               <p class="progress-count"><strong>{{ marks }}</strong> of {{ STAMP_TARGET }} stamps</p>
               <div class="progress" role="progressbar" :aria-valuenow="marks" aria-valuemin="0" :aria-valuemax="STAMP_TARGET" aria-labelledby="progress-title">
                 <span class="progress-fill" :style="{ width: `${(marks / STAMP_TARGET) * 100}%` }" />
               </div>
-              <p class="progress-text" aria-live="polite">
-                <Gift v-if="ready" :size="22" aria-hidden="true" />{{ progressText }}
-              </p>
-              <RouterLink :to="{ path: '/', hash: '#gifts' }" class="text-link">See the gifts you can choose <ArrowRight :size="18" aria-hidden="true" /></RouterLink>
+              <p class="progress-text" aria-live="polite">{{ progressText }}</p>
+              <RouterLink :to="{ path: '/', hash: '#gifts' }" class="link-arrow">See the gift shelf <ArrowRight :size="18" aria-hidden="true" /></RouterLink>
             </section>
 
             <section class="panel" aria-labelledby="activity-title">
@@ -101,16 +101,16 @@ function when(at: string) {
         <CodeDialog v-model:open="showCode" :qr="qr" :number="memberCard.number" :name="memberCard.name" :ready="ready" />
       </div>
 
-      <div v-else class="container">
-        <section class="panel empty-state" aria-labelledby="empty-title">
-          <span class="empty-icon"><QrCode :size="36" aria-hidden="true" /></span>
-          <h1 id="empty-title" class="h1">No card on this phone yet</h1>
-          <p class="lede">Your card is saved in the browser where you made it. If you don’t have one yet, it only takes a minute.</p>
+      <div v-else class="container empty-grid">
+        <section aria-labelledby="empty-title">
+          <h1 id="empty-title" class="h1">No card on this phone yet.</h1>
+          <p class="lede">Your card is saved in the browser where you made it. Haven’t got one? It takes less than a minute.</p>
           <div class="empty-actions">
             <RouterLink to="/join/" class="btn btn-primary btn-lg">Get your free card <ArrowRight :size="20" aria-hidden="true" /></RouterLink>
-            <RouterLink to="/" class="btn btn-secondary btn-lg">Back to home</RouterLink>
+            <RouterLink to="/" class="link-arrow">Back to home</RouterLink>
           </div>
         </section>
+        <ArchStage aria-hidden="true"><LoyaltyCard name="Your name" :marks="0" /></ArchStage>
       </div>
     </main>
     <SiteFooter />

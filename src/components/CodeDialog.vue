@@ -21,6 +21,7 @@ onMounted(() => sync(open.value));
 
 <template>
   <dialog ref="dialogEl" class="code-dialog" aria-labelledby="code-title" @close="open = false" @click.self="open = false">
+    <div class="awning awning-sm" aria-hidden="true" />
     <div class="code-sheet">
       <div class="code-head">
         <h2 id="code-title">{{ ready ? 'Scan to collect your gift' : 'Scan at checkout' }}</h2>

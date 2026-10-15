@@ -33,15 +33,14 @@ npm run preview
 
 ## Design notes
 
-This branch carries the **Classic** theme: a familiar retail look meant to read easily for every age, following common older-adult usability guidance and mainstream loyalty-app patterns.
+This branch carries the **Souq** theme: a market stall at golden hour, kept easy to read and use for everyone.
 
-- One font, Inter (Google Fonts, `index.html`), in sentence case. Body text is 18px; muted text keeps at least 7:1 contrast on white.
-- One deep blue for actions and amber only for the gift. Tokens are at the top of `src/style.css`.
-- Large rectangular buttons with text labels and 48px+ tap targets. No hidden gestures, carousels or rotated elements.
-- Progress is stated in words and shown as a bar, Starbucks-style ("2 of 3 stamps · 1 more stamp to get your free gift").
-- The checkout code opens from an explicit button in a native `<dialog>` (`src/components/CodeDialog.vue`), with Escape, backdrop and Done all closing it.
-- Phones get one column; wider screens (860px+) get a normal two-column site layout.
-- The card component (`src/components/LoyaltyCard.vue`) is a plain membership card that scales with container query units. Reduced-motion preferences disable all animation.
+- Palette: warm sand and paper, deep peacock teal for anything you press, terracotta for stamps, marigold for the gift. Tokens are at the top of `src/style.css`.
+- Type: Young Serif for headlines, Figtree for everything else (Google Fonts, `index.html`). Body text is 18px, in sentence case.
+- Motifs from the market: a scalloped striped awning under the header (and over the closing "stall" and the code dialog), round arches (`src/components/ArchStage.vue`), an eight-point star tile (`src/components/StarMark.vue` and the `--tile` pattern), and a gift shelf of arched niches with hanging price tags.
+- The card (`src/components/LoyaltyCard.vue`) is teal card stock with a star-tile ground; each stamp lands as a terracotta star, the gift as a marigold one. It scales with container query units.
+- UX stays plain: progress in words plus a bar ("2 of 3 stamps · 1 more stamp to get your free gift"), and the checkout code opens from a clearly labelled **Show my code** button in a native `<dialog>` (`src/components/CodeDialog.vue`), closed by Escape, the backdrop or Done.
+- Phones get one column; wider screens (900px+) get a two-column layout. Reduced-motion preferences disable all animation.
 
 ## Deployment
 

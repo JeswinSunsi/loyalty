@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
-import { ArrowLeft, ArrowRight, Check, Gift, Info } from '@lucide/vue';
+import { ArrowLeft, ArrowRight, Info } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
+import ArchStage from '../components/ArchStage.vue';
+import StarMark from '../components/StarMark.vue';
 import { createCard, memberCard } from '../store';
 const router = useRouter();
 const name = ref('');
@@ -22,9 +24,9 @@ function submit() {
       <div class="container">
         <RouterLink to="/" class="back-link"><ArrowLeft :size="20" aria-hidden="true" /> Back to home</RouterLink>
         <div class="join-grid">
-          <section class="panel join-panel" aria-labelledby="join-title">
-            <h1 id="join-title" class="h1">Get your free card</h1>
-            <p class="lede">Just tell us your name. Your card is ready straight away.</p>
+          <section class="join-copy" aria-labelledby="join-title">
+            <h1 id="join-title" class="h1">What should we<br />call you?</h1>
+            <p class="lede">That’s all we need. Your card is ready the moment you press create.</p>
 
             <div v-if="memberCard" class="alert alert-info" role="note">
               <Info :size="22" aria-hidden="true" />
@@ -32,26 +34,20 @@ function submit() {
             </div>
 
             <form class="join-form" novalidate @submit.prevent="submit">
-              <label for="member-name" class="field-label">Your name</label>
+              <label for="member-name" class="field-label">Name on your card</label>
               <input
-                id="member-name" v-model="name" class="input" required autocomplete="given-name" maxlength="40" placeholder="For example, Layla"
+                id="member-name" v-model="name" class="input input-lg" required autocomplete="given-name" maxlength="40" placeholder="For example, Layla"
                 :aria-invalid="!!error" :aria-describedby="error ? 'name-error name-hint' : 'name-hint'" @input="error = ''"
               />
               <p v-if="error" id="name-error" class="field-error" role="alert">{{ error }}</p>
-              <p id="name-hint" class="field-hint">Your first name or a nickname is fine.</p>
+              <p id="name-hint" class="field-hint">A first name or nickname is perfect. No phone number, email or password.</p>
               <button class="btn btn-primary btn-lg btn-block">Create my card <ArrowRight :size="20" aria-hidden="true" /></button>
             </form>
-
-            <ul class="trust-list trust-list-compact">
-              <li><Check :size="20" aria-hidden="true" /> No phone number or email</li>
-              <li><Check :size="20" aria-hidden="true" /> No password to remember</li>
-            </ul>
           </section>
 
           <aside class="join-preview" aria-label="Card preview">
-            <p class="preview-label">Your card will look like this</p>
-            <LoyaltyCard :name="name.trim() || 'Your name'" :marks="0" />
-            <p class="preview-note"><Gift :size="22" aria-hidden="true" /> Collect 3 stamps on this card to get a free gift.</p>
+            <ArchStage><LoyaltyCard :name="name.trim() || 'Your name'" :marks="0" /></ArchStage>
+            <p class="preview-note"><StarMark /> Three stamps on this card gets you a free gift.</p>
           </aside>
         </div>
       </div>
