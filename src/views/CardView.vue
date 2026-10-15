@@ -1,33 +1,27 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { ArrowRight, Gift, QrCode, Scissors, Sparkles, Stamp } from '@lucide/vue';
+import { ArrowRight, CircleCheck, Gift, QrCode, Sparkles, Stamp, TriangleAlert } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
-import InkStamp from '../components/InkStamp.vue';
-import { formatCardNumber, memberCard, STAMP_TARGET, storageAvailable, type ActivityKind } from '../store';
+import CodeDialog from '../components/CodeDialog.vue';
+import { memberCard, STAMP_TARGET, storageAvailable, type ActivityKind } from '../store';
 import { qrShape } from '../qr';
-import { FLIP_MS } from '../motion';
-import { curtain } from '../transition';
 
 const route = useRoute();
 const router = useRouter();
 // The welcome only greets the first visit; drop the flag so a refresh shows the everyday view.
 const welcome = ref(route.query.welcome === '1');
 if (welcome.value) void router.replace({ query: {} });
-// Came in behind the card curtain: the page settles into place as the curtain sweeps away.
-const arriving = curtain.value !== 'idle';
-const remaining = computed(() => STAMP_TARGET - (memberCard.value?.marks ?? 0));
+
+const marks = computed(() => memberCard.value?.marks ?? 0);
+const remaining = computed(() => STAMP_TARGET - marks.value);
 const ready = computed(() => remaining.value === 0);
 const firstName = computed(() => memberCard.value?.name.split(' ')[0] ?? '');
-// Headlines run in two lines like the front page: plain, then the saffron half.
-const headline = computed(() => ready.value ? ['Your gift', 'is ready.']
-  : remaining.value === 1 ? ['One more', 'stamp to go.']
-  : [`${['', 'One', 'Two', 'Three'][remaining.value]} stamps`, 'to your gift.']);
-const lede = computed(() => welcome.value ? 'At checkout, tap your card to show your code and collect your first stamp.'
-  : ready.value ? 'Tap your card to show your code, then choose your gift at the till.'
-  : 'Tap your card at the till to show your code. The team scans it and adds your stamp.');
+const progressText = computed(() => ready.value ? 'Your card is full. Your free gift is ready.'
+  : remaining.value === 1 ? '1 more stamp to get your free gift.'
+  : `${remaining.value} more stamps to get your free gift.`);
 
 const showCode = ref(false);
 const qr = computed(() => {
@@ -35,141 +29,89 @@ const qr = computed(() => {
   try { return qrShape(new URL(`${import.meta.env.BASE_URL}staff/?card=${memberCard.value.number}`, window.location.origin).href); }
   catch { return null; }
 });
-const cardEl = ref<HTMLElement | null>(null);
-// From the coupon further down: lift the card up, then quietly bring its spot into view behind the dimmed page,
-// so it has a short way home when put away.
-function presentCode() {
-  showCode.value = true;
-  window.setTimeout(() => cardEl.value?.scrollIntoView({ block: 'center' }), FLIP_MS);
-}
 
-const slip: Record<ActivityKind, { icon: typeof Stamp; item: string; amount: string }> = {
-  created: { icon: Sparkles, item: 'Card opened', amount: 'New' },
-  stamp: { icon: Stamp, item: 'Stamp', amount: '+1' },
-  redeemed: { icon: Gift, item: 'Free gift', amount: '−3' },
-};
-const dateFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' });
+const activityIcon: Record<ActivityKind, typeof Stamp> = { created: Sparkles, stamp: Stamp, redeemed: Gift };
+const dateFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
 const timeFormat = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
 function when(at: string) {
   const date = new Date(at);
-  return `${date.toDateString() === new Date().toDateString() ? 'Today' : dateFormat.format(date)}, ${timeFormat.format(date)}`;
+  return `${date.toDateString() === new Date().toDateString() ? 'Today' : dateFormat.format(date)} at ${timeFormat.format(date)}`;
 }
-const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' }).format(new Date(memberCard.value.since)) : '');
 </script>
 
 <template>
-  <div class="page-shell member-page">
-    <SiteHeader inverse />
-    <main id="main-content">
-      <template v-if="memberCard">
-        <section class="hero member-hero" :class="{ 'is-welcome': welcome, 'is-arriving': arriving }">
-          <InkStamp class="hero-ghost" ring="MEMBER · M SOUQ · REWARDS · " :texture="false" />
-          <div class="container hero-inner">
-            <p v-if="!storageAvailable" class="callout" role="status">This browser isn’t letting us save your card. Your stamps may not be here next time.</p>
-            <p class="hero-kicker">
-              <template v-if="welcome"><Sparkles :size="14" aria-hidden="true" /> Welcome to M Souq Rewards</template>
-              <template v-else>Hi, {{ firstName }}</template>
-            </p>
-            <h1 v-if="welcome" class="display">You’re in,<br /><span class="display-name">{{ firstName }}.</span></h1>
-            <h1 v-else class="display" aria-live="polite">{{ headline[0] }}<br /><span>{{ headline[1] }}</span></h1>
-            <p class="hero-lede">{{ lede }}</p>
-
-            <div ref="cardEl" class="member-card" :class="{ 'is-new': welcome, 'is-arriving': arriving }">
-              <LoyaltyCard v-model:flipped="showCode" :name="memberCard.name" :number="memberCard.number" :marks="memberCard.marks" :qr="qr" flippable />
-            </div>
-            <div class="try-caption member-caption">
-              <p aria-live="polite">
-                <template v-if="showCode">Hold your screen up to the scanner at the till.</template>
-                <template v-else-if="ready">Your card is full. Tap it to redeem your gift.</template>
-                <template v-else>Tap your card to show your checkout code.</template>
-              </p>
-              <button type="button" class="try-chip" :aria-pressed="showCode" @click="showCode = !showCode">
-                <QrCode :size="14" aria-hidden="true" /> Code
-              </button>
-            </div>
-            <p v-if="!qr" class="callout" role="status">Your code couldn’t load. Read your card number out at checkout instead.</p>
-          </div>
-        </section>
-
-        <section class="section" aria-labelledby="slip-heading">
-          <div class="container">
-            <p class="kicker">Your activity</p>
-            <h2 id="slip-heading" class="title">Every stamp,<br />on the slip.</h2>
-            <p class="section-lede">Stamps show up here the moment the team adds them at the till.</p>
-
-            <div class="receipt-wrap">
-              <div class="receipt">
-                <div class="r-head">
-                  <strong>M Souq</strong>
-                  <span>Rewards · member slip</span>
-                </div>
-                <hr class="r-rule" />
-                <dl class="r-meta">
-                  <div><dt>Member</dt><dd>{{ memberCard.name }}</dd></div>
-                  <div><dt>Card no.</dt><dd>{{ formatCardNumber(memberCard.number) }}</dd></div>
-                  <div><dt>Since</dt><dd>{{ sinceLabel }}</dd></div>
-                </dl>
-                <hr class="r-rule" />
-                <ol class="r-lines r-activity">
-                  <li v-for="item in memberCard.activity" :key="item.id" :class="`is-${item.kind}`">
-                    <component :is="slip[item.kind].icon" class="r-n" :size="15" aria-hidden="true" />
-                    <span class="r-item">{{ slip[item.kind].item }}</span>
-                    <span class="r-dots" aria-hidden="true" />
-                    <span class="r-amt">{{ slip[item.kind].amount }}</span>
-                    <time class="r-note" :datetime="item.at">{{ when(item.at) }}</time>
-                  </li>
-                </ol>
-                <hr class="r-rule" />
-                <dl class="r-total">
-                  <div><dt>Stamps</dt><span class="r-dots" aria-hidden="true" /><dd>{{ memberCard.marks }} / {{ STAMP_TARGET }}</dd></div>
-                  <div>
-                    <dt>Your gift</dt><span class="r-dots" aria-hidden="true" />
-                    <dd><span v-if="ready" class="r-free">Ready</span><template v-else>{{ remaining }} to go</template></dd>
-                  </div>
-                </dl>
-                <hr class="r-rule" />
-                <p class="r-foot">Show your card at checkout<br />Thank you for shopping</p>
-                <div class="r-barcode" aria-hidden="true" />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="container closing">
-          <div class="coupon">
-            <Scissors class="coupon-cut" :size="18" aria-hidden="true" />
-            <InkStamp class="coupon-stamp" />
-            <template v-if="ready">
-              <h2 class="title">Your free gift is waiting.</h2>
-              <p>Show your code at the till and choose from the gift shelf.</p>
-              <button type="button" class="btn btn-primary btn-lg btn-block" @click="presentCode">
-                Show my code<QrCode :size="18" aria-hidden="true" />
-              </button>
-            </template>
-            <template v-else>
-              <h2 class="title">Pick your gift when the card’s full.</h2>
-              <p>Cleaning pens, smart bands, earbuds and more. The shelf changes with the season.</p>
-              <RouterLink :to="{ path: '/', hash: '#gifts' }" class="btn btn-primary btn-lg btn-block">
-                See the gift shelf<ArrowRight :size="18" aria-hidden="true" />
-              </RouterLink>
-            </template>
-          </div>
-        </section>
-      </template>
-
-      <section v-else class="hero member-hero" :class="{ 'is-arriving': arriving }">
-        <InkStamp class="hero-ghost" ring="STAMP · STAMP · STAMP · FREE GIFT · " :texture="false" />
-        <div class="container hero-inner">
-          <p class="hero-kicker">My card</p>
-          <h1 class="display">No card<br /><span>here yet.</span></h1>
-          <p class="hero-lede">Your card is saved in the browser where you made it. Haven’t got one? It takes a few seconds.</p>
-          <div class="try-card empty-card" aria-hidden="true"><LoyaltyCard name="Your name" :marks="0" decorative /></div>
-          <div class="hero-cta">
-            <RouterLink to="/join/" class="btn btn-saffron btn-lg btn-block">Get your free card<ArrowRight :size="18" aria-hidden="true" /></RouterLink>
-            <p class="hero-fine">Free · No app · Ready in seconds</p>
+  <div class="page-shell">
+    <SiteHeader />
+    <main id="main-content" class="page-main">
+      <div v-if="memberCard" class="container">
+        <div v-if="welcome" class="alert alert-success" role="status">
+          <CircleCheck :size="24" aria-hidden="true" />
+          <div>
+            <p class="alert-title">Your card is ready, {{ firstName }}!</p>
+            <p>Next time you shop, press <strong>Show my code</strong> at the till to collect your first stamp.</p>
           </div>
         </div>
-      </section>
+        <div v-if="!storageAvailable" class="alert alert-warning" role="status">
+          <TriangleAlert :size="24" aria-hidden="true" />
+          <p>This browser isn’t letting us save your card. Your stamps may not be here next time.</p>
+        </div>
+
+        <header class="page-head">
+          <h1 class="h1">Hello, {{ firstName }}</h1>
+          <p class="lede">This is your M Souq rewards card.</p>
+        </header>
+
+        <div class="card-grid">
+          <section class="panel" aria-label="Your card">
+            <LoyaltyCard :name="memberCard.name" :number="memberCard.number" :marks="memberCard.marks" />
+            <button type="button" class="btn btn-primary btn-lg btn-block code-btn" @click="showCode = true">
+              <QrCode :size="22" aria-hidden="true" /> Show my code
+            </button>
+            <p class="help-text">Press this at the till. The cashier scans the code to add your stamp.</p>
+          </section>
+
+          <div class="card-side">
+            <section class="panel" :class="{ 'panel-accent': ready }" aria-labelledby="progress-title">
+              <h2 id="progress-title" class="h3">Your progress</h2>
+              <p class="progress-count"><strong>{{ marks }}</strong> of {{ STAMP_TARGET }} stamps</p>
+              <div class="progress" role="progressbar" :aria-valuenow="marks" aria-valuemin="0" :aria-valuemax="STAMP_TARGET" aria-labelledby="progress-title">
+                <span class="progress-fill" :style="{ width: `${(marks / STAMP_TARGET) * 100}%` }" />
+              </div>
+              <p class="progress-text" aria-live="polite">
+                <Gift v-if="ready" :size="22" aria-hidden="true" />{{ progressText }}
+              </p>
+              <RouterLink :to="{ path: '/', hash: '#gifts' }" class="text-link">See the gifts you can choose <ArrowRight :size="18" aria-hidden="true" /></RouterLink>
+            </section>
+
+            <section class="panel" aria-labelledby="activity-title">
+              <h2 id="activity-title" class="h3">Recent activity</h2>
+              <ul class="activity">
+                <li v-for="item in memberCard.activity" :key="item.id" :class="`is-${item.kind}`">
+                  <span class="activity-icon"><component :is="activityIcon[item.kind]" :size="20" aria-hidden="true" /></span>
+                  <span class="activity-text">
+                    <span class="activity-title">{{ item.text }}</span>
+                    <time :datetime="item.at">{{ when(item.at) }}</time>
+                  </span>
+                </li>
+              </ul>
+            </section>
+          </div>
+        </div>
+
+        <CodeDialog v-model:open="showCode" :qr="qr" :number="memberCard.number" :name="memberCard.name" :ready="ready" />
+      </div>
+
+      <div v-else class="container">
+        <section class="panel empty-state" aria-labelledby="empty-title">
+          <span class="empty-icon"><QrCode :size="36" aria-hidden="true" /></span>
+          <h1 id="empty-title" class="h1">No card on this phone yet</h1>
+          <p class="lede">Your card is saved in the browser where you made it. If you don’t have one yet, it only takes a minute.</p>
+          <div class="empty-actions">
+            <RouterLink to="/join/" class="btn btn-primary btn-lg">Get your free card <ArrowRight :size="20" aria-hidden="true" /></RouterLink>
+            <RouterLink to="/" class="btn btn-secondary btn-lg">Back to home</RouterLink>
+          </div>
+        </section>
+      </div>
     </main>
     <SiteFooter />
   </div>

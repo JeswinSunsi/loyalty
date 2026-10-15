@@ -5,12 +5,20 @@ const year = new Date().getFullYear();
 </script>
 <template>
   <footer class="site-footer">
-    <div class="footer-inner">
-      <span class="footer-brand"><BrandMark :size="22" /> © {{ year }} M Souq</span>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <BrandMark :size="32" />
+        <div>
+          <p class="footer-name">M Souq Rewards</p>
+          <p class="footer-note">Collect 3 stamps, get a free gift.</p>
+        </div>
+      </div>
       <nav class="footer-links" aria-label="Footer">
-        <RouterLink :to="{ path: '/', hash: '#questions' }">Questions</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#how-it-works' }">How it works</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#questions' }">Help and questions</RouterLink>
         <RouterLink to="/staff/">Staff checkout</RouterLink>
       </nav>
+      <p class="footer-copy">© {{ year }} M Souq</p>
     </div>
   </footer>
 </template>

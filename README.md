@@ -6,7 +6,7 @@ A Vue 3 / TypeScript / Vite loyalty card site. Customers collect **3 stamps for 
 
 - `/`: introduction, how it works, gifts, questions
 - `/join/`: create a card with just a name
-- `/card/`: the customer's card with stamp progress (tap it to flip over and stand it upright as a tall card with the checkout QR code), and activity as a stamp slip
+- `/card/`: the customer's card, a progress bar ("1 more stamp to get your free gift"), recent activity, and a **Show my code** button that opens the checkout QR code in a dialog
 - `/staff/`: staff checkout. Look up a card by scanning its code or typing its 8-digit number, add one stamp per checkout, undo the last change, and confirm gift redemption. Redeeming uses all three stamps and starts the next card at zero.
 
 `/login/` redirects to `/card/` and `/staff/login/` redirects to `/staff/`.
@@ -33,9 +33,15 @@ npm run preview
 
 ## Design notes
 
-- Fonts: Bricolage Grotesque (display), Geist (body), Geist Mono (card numbers), loaded from Google Fonts in `index.html`.
-- Colour and type tokens are defined at the top of `src/style.css`.
-- The card component (`src/components/LoyaltyCard.vue`) scales with container query units and tilts gently under a mouse pointer. Reduced-motion preferences disable all animation.
+This branch carries the **Classic** theme: a familiar retail look meant to read easily for every age, following common older-adult usability guidance and mainstream loyalty-app patterns.
+
+- One font, Inter (Google Fonts, `index.html`), in sentence case. Body text is 18px; muted text keeps at least 7:1 contrast on white.
+- One deep blue for actions and amber only for the gift. Tokens are at the top of `src/style.css`.
+- Large rectangular buttons with text labels and 48px+ tap targets. No hidden gestures, carousels or rotated elements.
+- Progress is stated in words and shown as a bar, Starbucks-style ("2 of 3 stamps · 1 more stamp to get your free gift").
+- The checkout code opens from an explicit button in a native `<dialog>` (`src/components/CodeDialog.vue`), with Escape, backdrop and Done all closing it.
+- Phones get one column; wider screens (860px+) get a normal two-column site layout.
+- The card component (`src/components/LoyaltyCard.vue`) is a plain membership card that scales with container query units. Reduced-motion preferences disable all animation.
 
 ## Deployment
 
