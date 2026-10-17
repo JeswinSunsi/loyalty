@@ -50,7 +50,7 @@ const faqs = [
         <div class="container hero-inner">
           <p class="hero-kicker">M Souq Rewards</p>
           <h1 class="display">Shop at M Souq.<br /><span>Get free gifts.</span></h1>
-          <p class="hero-lede">Collect a stamp each time you buy. Three stamps gets you a gift: earbuds, a smart band and more.</p>
+          <p class="hero-lede">Collect a stamp each time you shop. Three stamps gets you a gift: earbuds, a smart band and more.</p>
 
           <div
             class="try-card" :class="{ 'is-thump': thump, 'is-full': tryMarks === STAMP_TARGET }"
