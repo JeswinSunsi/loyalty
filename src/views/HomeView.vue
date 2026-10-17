@@ -24,9 +24,9 @@ const facts = [
 ];
 // How it works, rung up as a till receipt.
 const steps = [
-  { title: 'Make your card', amount: 'Free', note: 'Type your name and you’re done. The card is saved on your phone.' },
-  { title: 'Shop at M Souq', amount: '+1 stamp', note: 'Show your card when you pay and we’ll add a stamp. Ask at the till if your purchase counts.' },
-  { title: 'Get rewards', amount: 'Gift', note: 'Your third stamp gets you a gift from the shelf. Then your card starts again.' },
+  { title: 'Make your card', amount: 'Free' },
+  { title: 'Shop at M Souq', amount: '+1 stamp' },
+  { title: 'Get rewards', amount: 'Gift' },
 ];
 const gifts = [
   { icon: Headphones, name: 'Earbuds', note: 'Wireless, with a charging case' },
@@ -83,7 +83,6 @@ const faqs = [
             <div class="receipt">
               <div class="r-head">
                 <strong>M Souq</strong>
-                <span>Rewards · how it works</span>
               </div>
               <hr class="r-rule" />
               <ol class="r-lines">
@@ -91,7 +90,6 @@ const faqs = [
                   <span class="r-item">{{ step.title }}</span>
                   <span class="r-dots" aria-hidden="true" />
                   <span class="r-amt">{{ step.amount }}</span>
-                  <span class="r-note">{{ step.note }}</span>
                 </li>
               </ol>
               <hr class="r-rule" />
