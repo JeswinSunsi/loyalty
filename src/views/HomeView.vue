@@ -19,8 +19,7 @@ onBeforeUnmount(() => window.clearInterval(demoTimer));
 
 const facts = [
   { value: 'Free', label: 'to join' },
-  { value: '3', label: 'stamps per gift' },
-  { value: '0', label: 'apps to download' },
+  { value: '20+', label: 'free gifts' },
 ];
 // How it works, rung up as a till receipt.
 const steps = [
