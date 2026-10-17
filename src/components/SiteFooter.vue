@@ -6,8 +6,9 @@ const year = new Date().getFullYear();
 <template>
   <footer class="site-footer">
     <div class="footer-inner">
-      <span class="footer-brand"><BrandMark :size="22" /> © {{ year }} M Souq</span>
+      <span class="footer-brand"><BrandMark :size="20" /> © {{ year }} M Souq</span>
       <nav class="footer-links" aria-label="Footer">
+        <RouterLink :to="{ path: '/', hash: '#how-it-works' }">How it works</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#questions' }">Questions</RouterLink>
         <RouterLink to="/staff/">Staff checkout</RouterLink>
       </nav>

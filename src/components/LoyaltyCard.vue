@@ -1,20 +1,16 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue';
-import { Gift } from '@lucide/vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { Check, Gift } from '@lucide/vue';
 import BrandMark from './BrandMark.vue';
-import InkStamp from './InkStamp.vue';
 import { formatCardNumber, STAMP_TARGET } from '../store';
 import { glide } from '../motion';
 import type { QrShape } from '../qr';
 
 const props = withDefaults(defineProps<{ name: string; marks: number; number?: string; decorative?: boolean; flippable?: boolean; qr?: QrShape | null }>(), { number: '', decorative: false, flippable: false, qr: null });
 const flipped = defineModel<boolean>('flipped', { default: false });
-const patternId = `lc-lattice-${useId()}`;
 const marks = computed(() => Math.max(0, Math.min(STAMP_TARGET, props.marks)));
 const complete = computed(() => marks.value === STAMP_TARGET);
 const status = computed(() => complete.value ? 'Gift ready' : STAMP_TARGET - marks.value === 1 ? '1 to go' : `${STAMP_TARGET - marks.value} to go`);
-// A slight, varied tilt makes each stamp feel pressed by hand.
-const angles = [-12, 8, -5];
 
 /*
   Opening lifts the card out of the page: it floats to the middle of the screen over a dimmed page, turning over and
@@ -71,28 +67,17 @@ const label = computed(() => flipped.value
             @click="toggle" @keydown.enter.prevent="toggle" @keydown.space.prevent="toggle"
           >
             <div class="lc lc-front" :class="{ 'is-complete': complete }" :aria-hidden="decorative || (flippable && flipped) || undefined">
-              <svg class="lc-pattern" aria-hidden="true">
-                <defs>
-                  <pattern :id="patternId" width="36" height="36" patternUnits="userSpaceOnUse">
-                    <g fill="none" stroke="currentColor" stroke-width=".8">
-                      <rect x="10" y="10" width="16" height="16" />
-                      <rect x="10" y="10" width="16" height="16" transform="rotate(45 18 18)" />
-                    </g>
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" :fill="`url(#${patternId})`" />
-              </svg>
               <div class="lc-glow" aria-hidden="true" />
               <div class="lc-body">
                 <div class="lc-top">
-                  <span class="lc-brand"><BrandMark :size="26" /> M Souq</span>
+                  <span class="lc-brand"><BrandMark :size="24" /> M Souq</span>
                   <span class="lc-status">{{ status }}</span>
                 </div>
                 <ol class="lc-stamps" :aria-label="`${marks} of ${STAMP_TARGET} stamps collected${complete ? '. Free gift ready.' : ''}`">
                   <li v-for="i in STAMP_TARGET" :key="i" class="lc-slot" :class="{ 'is-filled': i <= marks, 'is-gift': i === STAMP_TARGET }">
-                    <span v-if="i <= marks" class="lc-stamp" :class="{ 'is-gift-stamp': i === STAMP_TARGET }" :style="{ '--angle': `${angles[i - 1]}deg` }" aria-hidden="true">
+                    <span v-if="i <= marks" class="lc-stamp" :class="{ 'is-gift-stamp': i === STAMP_TARGET }" aria-hidden="true">
                       <Gift v-if="i === STAMP_TARGET" :stroke-width="2" />
-                      <InkStamp v-else />
+                      <Check v-else :stroke-width="2.5" />
                     </span>
                     <Gift v-else-if="i === STAMP_TARGET" class="lc-slot-icon" :stroke-width="1.6" aria-hidden="true" />
                     <span v-else class="lc-slot-num" aria-hidden="true">{{ i }}</span>
@@ -112,17 +97,6 @@ const label = computed(() => flipped.value
             </div>
 
             <div v-if="flippable" class="lc lc-back" :class="{ 'is-complete': complete }" :aria-hidden="!flipped">
-              <svg class="lc-pattern" aria-hidden="true">
-                <defs>
-                  <pattern :id="`${patternId}-back`" width="36" height="36" patternUnits="userSpaceOnUse">
-                    <g fill="none" stroke="#fff" stroke-width=".8">
-                      <rect x="10" y="10" width="16" height="16" />
-                      <rect x="10" y="10" width="16" height="16" transform="rotate(45 18 18)" />
-                    </g>
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" :fill="`url(#${patternId}-back)`" />
-              </svg>
               <div class="lc-portrait">
                 <div class="lc-top">
                   <span class="lc-brand"><BrandMark :size="20" /> M Souq</span>
@@ -144,6 +118,7 @@ const label = computed(() => flipped.value
                 <ol class="lc-pass-stamps" aria-hidden="true">
                   <li v-for="i in STAMP_TARGET" :key="i" :class="{ 'is-on': i <= marks, 'is-gift': i === STAMP_TARGET }">
                     <Gift v-if="i === STAMP_TARGET" :stroke-width="2" />
+                    <Check v-else-if="i <= marks" :stroke-width="2.5" />
                     <span v-else>{{ i }}</span>
                   </li>
                 </ol>

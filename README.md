@@ -33,7 +33,8 @@ npm run preview
 
 ## Design notes
 
-- Fonts: Bricolage Grotesque (display), Geist (body), Geist Mono (card numbers), loaded from Google Fonts in `index.html`.
+- Theme: quiet and precise, after Stripe. White pages, navy type, one blurple accent (`#533afd`), hairline borders, soft layered shadows, and a single static pastel band behind the card. The card float-and-flip is the only showpiece motion.
+- Fonts: Inter (text) and Source Code Pro (card numbers), loaded from Google Fonts in `index.html`.
 - Colour and type tokens are defined at the top of `src/style.css`.
 - The card component (`src/components/LoyaltyCard.vue`) scales with container query units and tilts gently under a mouse pointer. Reduced-motion preferences disable all animation.
 

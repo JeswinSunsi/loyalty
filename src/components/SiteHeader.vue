@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import { ArrowUpRight } from '@lucide/vue';
 import BrandMark from './BrandMark.vue';
-withDefaults(defineProps<{ staff?: boolean; inverse?: boolean }>(), { staff: false, inverse: false });
+import HoverArrow from './HoverArrow.vue';
+withDefaults(defineProps<{ staff?: boolean }>(), { staff: false });
 </script>
 <template>
   <a class="skip-link" href="#main-content">Skip to content</a>
-  <header class="site-header" :class="{ 'is-staff': staff, 'is-inverse': inverse }">
+  <header class="site-header" :class="{ 'is-staff': staff }">
     <div class="header-inner">
       <RouterLink to="/" class="brand" aria-label="M Souq Rewards home">
-        <BrandMark :size="30" />
+        <BrandMark :size="26" />
         <span class="brand-name">M Souq</span>
         <span class="brand-tag">{{ staff ? 'Staff' : 'Rewards' }}</span>
       </RouterLink>
       <nav class="header-nav" aria-label="Main">
-        <RouterLink v-if="staff" to="/" class="nav-link">Customer site <ArrowUpRight :size="15" aria-hidden="true" /></RouterLink>
-        <RouterLink v-else to="/card/" class="nav-card">My card</RouterLink>
+        <RouterLink v-if="staff" to="/" class="nav-link">Customer site <HoverArrow /></RouterLink>
+        <RouterLink v-else to="/card/" class="btn btn-primary btn-sm">My card <HoverArrow /></RouterLink>
       </nav>
     </div>
   </header>
