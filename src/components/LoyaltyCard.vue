@@ -11,7 +11,6 @@ const flipped = defineModel<boolean>('flipped', { default: false });
 const marks = computed(() => Math.max(0, Math.min(STAMP_TARGET, props.marks)));
 const complete = computed(() => marks.value === STAMP_TARGET);
 const status = computed(() => complete.value ? 'Gift ready' : STAMP_TARGET - marks.value === 1 ? '1 to go' : `${STAMP_TARGET - marks.value} to go`);
-
 /*
   Opening lifts the card out of the page: it floats to the middle of the screen over a dimmed page, turning over and
   standing up as a tall pass with the code. Closing sends it back to its place. The floating card is laid out at its
@@ -97,12 +96,19 @@ const label = computed(() => flipped.value
             </div>
 
             <div v-if="flippable" class="lc lc-back" :class="{ 'is-complete': complete }" :aria-hidden="!flipped">
+              <!-- A ticket: blurple stub with who it belongs to, notched where it meets the white face that carries the code. -->
               <div class="lc-portrait">
-                <div class="lc-top">
-                  <span class="lc-brand"><BrandMark :size="20" /> M Souq</span>
-                  <span class="lc-status">{{ status }}</span>
+                <div class="lc-pass-head">
+                  <div class="lc-top">
+                    <span class="lc-brand"><BrandMark :size="20" /> M Souq</span>
+                    <span class="lc-status">{{ status }}</span>
+                  </div>
+                  <div class="lc-field">
+                    <span class="lc-label">Member</span>
+                    <span class="lc-name">{{ name }}</span>
+                  </div>
                 </div>
-                <div class="lc-pass-code">
+                <div class="lc-pass-body">
                   <div class="lc-qr-area">
                     <div class="lc-qr">
                       <svg v-if="qr" :viewBox="`-1 -1 ${qr.size + 2} ${qr.size + 2}`" shape-rendering="crispEdges" role="img" aria-label="Your rewards code">
@@ -112,21 +118,8 @@ const label = computed(() => flipped.value
                       <span class="lc-scan" aria-hidden="true" />
                     </div>
                   </div>
-                  <p class="lc-back-title">{{ complete ? 'Scan to redeem' : 'Scan at checkout' }}</p>
-                  <p class="lc-back-number"><span class="lc-label">No.</span> {{ formatCardNumber(number) }}</p>
-                </div>
-                <ol class="lc-pass-stamps" aria-hidden="true">
-                  <li v-for="i in STAMP_TARGET" :key="i" :class="{ 'is-on': i <= marks, 'is-gift': i === STAMP_TARGET }">
-                    <Gift v-if="i === STAMP_TARGET" :stroke-width="2" />
-                    <Check v-else-if="i <= marks" :stroke-width="2.5" />
-                    <span v-else>{{ i }}</span>
-                  </li>
-                </ol>
-                <div class="lc-bottom">
-                  <div class="lc-field">
-                    <span class="lc-label">Member</span>
-                    <span class="lc-name">{{ name }}</span>
-                  </div>
+                  <p class="lc-back-number">{{ formatCardNumber(number) }}</p>
+                  <p class="lc-back-title">{{ complete ? 'Scan to collect your gift' : 'Scan at the counter' }}</p>
                 </div>
               </div>
               <span class="lc-shine" aria-hidden="true" />

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { Gift, QrCode, Sparkles, Stamp } from '@lucide/vue';
+import { QrCode } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
@@ -40,16 +40,16 @@ function presentCode() {
   window.setTimeout(() => cardEl.value?.scrollIntoView({ block: 'center' }), FLIP_MS);
 }
 
-const kinds: Record<ActivityKind, { icon: typeof Stamp; item: string; amount: string }> = {
-  created: { icon: Sparkles, item: 'Card created', amount: 'New' },
-  stamp: { icon: Stamp, item: 'Stamp', amount: '+1' },
-  redeemed: { icon: Gift, item: 'Gift collected', amount: '−3' },
+const kinds: Record<ActivityKind, { item: string; amount: string }> = {
+  created: { item: 'Card created', amount: 'New' },
+  stamp: { item: 'Stamp', amount: '+1' },
+  redeemed: { item: 'Gift collected', amount: '−3' },
 };
-const dateFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' });
-const timeFormat = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+// Printed like a till date, always the same width so the lines stay in a column: "05 Oct".
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 function when(at: string) {
   const date = new Date(at);
-  return `${date.toDateString() === new Date().toDateString() ? 'Today' : dateFormat.format(date)}, ${timeFormat.format(date)}`;
+  return `${String(date.getDate()).padStart(2, '0')} ${months[date.getMonth()]}`;
 }
 const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' }).format(new Date(memberCard.value.since)) : '');
 </script>
@@ -96,29 +96,39 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
             <p class="kicker">History</p>
             <h2 id="activity-heading" class="title">Your stamps <span>and gifts.</span></h2>
 
-            <div class="panel activity">
-              <dl class="summary">
-                <div><dt>Member</dt><dd>{{ memberCard.name }}</dd></div>
-                <div><dt>Card no.</dt><dd class="mono">{{ formatCardNumber(memberCard.number) }}</dd></div>
-                <div><dt>Since</dt><dd>{{ sinceLabel }}</dd></div>
-              </dl>
-              <div class="progress" role="img" :aria-label="`${memberCard.marks} of ${STAMP_TARGET} stamps`">
-                <div class="progress-head">
-                  <span>Stamps</span>
-                  <span class="mono">{{ memberCard.marks }} / {{ STAMP_TARGET }}</span>
+            <!-- The member slip: the same till receipt as the front page, printed with this card's history. -->
+            <div class="receipt-wrap">
+              <div class="receipt">
+                <div class="r-head">
+                  <strong>M Souq</strong>
                 </div>
-                <div class="progress-track"><span class="progress-fill" :class="{ 'is-ready': ready }" :style="{ width: `${(memberCard.marks / STAMP_TARGET) * 100}%` }" /></div>
+                <hr class="r-rule" />
+                <dl class="r-meta">
+                  <div><dt>Member</dt><dd>{{ memberCard.name }}</dd></div>
+                  <div><dt>Card no.</dt><dd>{{ formatCardNumber(memberCard.number) }}</dd></div>
+                  <div><dt>Since</dt><dd>{{ sinceLabel }}</dd></div>
+                </dl>
+                <hr class="r-rule" />
+                <ol class="r-lines r-activity">
+                  <li v-for="item in memberCard.activity" :key="item.id" :class="`is-${item.kind}`">
+                    <time class="r-date" :datetime="item.at">{{ when(item.at) }}</time>
+                    <span class="r-item">{{ kinds[item.kind].item }}</span>
+                    <span class="r-dots" aria-hidden="true" />
+                    <span class="r-amt">{{ kinds[item.kind].amount }}</span>
+                  </li>
+                </ol>
+                <hr class="r-rule" />
+                <dl class="r-total">
+                  <div><dt>Stamps</dt><span class="r-dots" aria-hidden="true" /><dd>{{ memberCard.marks }} / {{ STAMP_TARGET }}</dd></div>
+                  <div>
+                    <dt>Your gift</dt><span class="r-dots" aria-hidden="true" />
+                    <dd><span v-if="ready" class="r-free">Ready</span><template v-else>{{ STAMP_TARGET - memberCard.marks }} to go</template></dd>
+                  </div>
+                </dl>
+                <hr class="r-rule" />
+                <p class="r-foot">Show your card at the counter<br />Thank you for shopping</p>
+                <div class="r-barcode" aria-hidden="true" />
               </div>
-              <ol class="rows">
-                <li v-for="item in memberCard.activity" :key="item.id" class="row" :class="`is-${item.kind}`">
-                  <span class="icon-tile icon-tile-sm"><component :is="kinds[item.kind].icon" :size="15" aria-hidden="true" /></span>
-                  <span class="row-main">
-                    <span class="row-item">{{ kinds[item.kind].item }}</span>
-                    <time class="row-time" :datetime="item.at">{{ when(item.at) }}</time>
-                  </span>
-                  <span class="row-amt">{{ kinds[item.kind].amount }}</span>
-                </li>
-              </ol>
             </div>
           </div>
         </section>
