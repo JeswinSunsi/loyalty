@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
-import { Gift, Headphones, PenTool, Plus, ScanLine, Sparkles, UserRound, Watch } from '@lucide/vue';
+import { Headphones, PenTool, Plus, Sparkles, Watch } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
@@ -22,10 +22,11 @@ const facts = [
   { value: '3', label: 'stamps per gift' },
   { value: '0', label: 'apps to download' },
 ];
+// How it works, rung up as a till receipt.
 const steps = [
-  { icon: UserRound, title: 'Make your card', note: 'Type your name and you’re done. The card is saved on your phone.' },
-  { icon: ScanLine, title: 'Shop at M Souq', note: 'Show your card when you pay and we’ll add a stamp. Ask at the till if your purchase counts.' },
-  { icon: Gift, title: 'Get rewards', note: 'Your third stamp gets you a gift from the shelf. Then your card starts again.' },
+  { title: 'Make your card', amount: 'Free', note: 'Type your name and you’re done. The card is saved on your phone.' },
+  { title: 'Shop at M Souq', amount: '+1 stamp', note: 'Show your card when you pay and we’ll add a stamp. Ask at the till if your purchase counts.' },
+  { title: 'Get rewards', amount: 'Gift', note: 'Your third stamp gets you a gift from the shelf. Then your card starts again.' },
 ];
 const gifts = [
   { icon: Headphones, name: 'Earbuds', note: 'Wireless, with a charging case' },
@@ -78,15 +79,31 @@ const faqs = [
         <div class="container">
           <p class="kicker">How it works</p>
           <h2 id="how-heading" class="title">Collect stamps, <span>pick a gift.</span></h2>
-          <ol class="steps">
-            <li v-for="step in steps" :key="step.title" class="step">
-              <span class="icon-tile"><component :is="step.icon" :size="18" aria-hidden="true" /></span>
-              <div>
-                <h3 class="step-title">{{ step.title }}</h3>
-                <p class="step-note">{{ step.note }}</p>
+          <div class="receipt-wrap">
+            <div class="receipt">
+              <div class="r-head">
+                <strong>M Souq</strong>
+                <span>Rewards · how it works</span>
               </div>
-            </li>
-          </ol>
+              <hr class="r-rule" />
+              <ol class="r-lines">
+                <li v-for="step in steps" :key="step.title">
+                  <span class="r-item">{{ step.title }}</span>
+                  <span class="r-dots" aria-hidden="true" />
+                  <span class="r-amt">{{ step.amount }}</span>
+                  <span class="r-note">{{ step.note }}</span>
+                </li>
+              </ol>
+              <hr class="r-rule" />
+              <dl class="r-total">
+                <div><dt>Stamps</dt><span class="r-dots" aria-hidden="true" /><dd>3 / 3</dd></div>
+                <div><dt>Your gift</dt><span class="r-dots" aria-hidden="true" /><dd><span class="r-free">Free</span></dd></div>
+              </dl>
+              <hr class="r-rule" />
+              <p class="r-foot">Show your card at checkout<br />Thank you for shopping</p>
+              <div class="r-barcode" aria-hidden="true" />
+            </div>
+          </div>
         </div>
       </section>
 

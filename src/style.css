@@ -262,11 +262,31 @@ main:focus { outline: none; }
 .section { padding-block: 64px; }
 .section-tint { background: var(--bg-2); border-block: 1px solid var(--line); }
 
-/* Steps */
-.steps { display: grid; gap: 4px; margin: 28px 0 0; padding: 0; list-style: none; }
-.step { display: grid; grid-template-columns: auto 1fr; gap: 16px; padding: 18px 0; border-top: 1px solid var(--line); }
-.step-title { display: flex; align-items: baseline; gap: 10px; font-size: 17px; letter-spacing: -.015em; }
-.step-note { margin-top: 4px; color: var(--muted); font-size: 15.5px; line-height: 1.55; }
+/* Receipt: How it works, rung up at the till. Torn zig-zag edges, dotted leaders, a barcode at the foot. */
+.receipt-wrap { margin-top: 28px; filter: drop-shadow(0 1px 1px rgb(10 37 64 / .05)) drop-shadow(0 14px 20px rgb(50 50 93 / .13)); }
+.receipt {
+  --zz: 14px;
+  padding: 30px 20px 34px; background: var(--surface); color: var(--ink); font-family: var(--font-mono); font-size: 13.5px; line-height: 1.45;
+  -webkit-mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--zz) 51% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--zz) 51% repeat-x;
+  mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--zz) 51% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--zz) 51% repeat-x;
+}
+.r-head { display: grid; justify-items: center; gap: 2px; text-align: center; }
+.r-head strong { font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
+.r-head span { color: var(--faint); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; }
+.r-rule { margin: 16px 0; border: 0; border-top: 1.5px dashed var(--line-2); }
+.r-lines { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+.r-lines li { display: grid; grid-template-columns: auto 1fr auto; column-gap: 8px; align-items: baseline; }
+.r-item { font-weight: 600; text-transform: uppercase; }
+.r-dots { align-self: end; min-width: 12px; margin-bottom: .32em; border-bottom: 1.5px dotted var(--line-2); }
+.r-amt { color: var(--brand); font-weight: 600; text-transform: uppercase; }
+.r-note { grid-column: 1 / -1; margin-top: 3px; color: var(--muted); font-family: var(--font-body); font-size: 14.5px; line-height: 1.5; }
+.r-total { display: grid; gap: 10px; margin: 0; }
+.r-total div { display: grid; grid-template-columns: auto 1fr auto; column-gap: 8px; align-items: baseline; }
+.r-total dt { font-weight: 600; text-transform: uppercase; }
+.r-total dd { margin: 0; font-weight: 600; }
+.r-free { display: inline-block; padding: 1px 10px; border: 2px solid var(--brand); border-radius: 6px; color: var(--brand); font-family: var(--font-display); font-size: 16px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; transform: rotate(-4deg); }
+.r-foot { color: var(--faint); font-size: 12px; letter-spacing: .1em; text-align: center; text-transform: uppercase; }
+.r-barcode { height: 44px; margin: 16px auto 0; width: 72%; background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 4px, var(--ink) 4px 5px, transparent 5px 8px, var(--ink) 8px 11px, transparent 11px 12px, var(--ink) 12px 13px, transparent 13px 17px); }
 .icon-tile { display: inline-grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; border-radius: 10px; background: var(--brand-tint); color: var(--brand); }
 .icon-tile-sm { width: 32px; height: 32px; border-radius: 8px; }
 
