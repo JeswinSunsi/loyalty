@@ -329,32 +329,39 @@ main:focus { outline: none; }
 .back-link { display: flex; align-items: center; gap: 6px; width: fit-content; min-height: 44px; margin: -12px 0 12px -4px; padding: 0 4px; color: var(--muted); font-size: 15px; font-weight: 500; }
 .back-link:hover { color: var(--ink); }
 .field-label { display: block; margin-bottom: 8px; color: var(--ink); font-size: 14px; font-weight: 600; }
-.field-hint { margin: 10px 0 20px; color: var(--muted); font-size: 14px; line-height: 1.5; }
 .field-error { margin-top: 8px; color: var(--danger); font-size: 14px; font-weight: 500; }
 .input { display: block; width: 100%; min-height: 48px; padding: 0 14px; border: 0; border-radius: 8px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-2), var(--shadow-sm); color: var(--ink); font-size: 16px; outline: none; transition: box-shadow .15s; }
 .input::placeholder { color: #8898aa; }
 .input:focus { box-shadow: inset 0 0 0 1px var(--brand), 0 0 0 4px rgb(83 58 253 / .18); }
 .input[aria-invalid="true"] { box-shadow: inset 0 0 0 1px var(--danger), 0 0 0 4px rgb(192 18 60 / .12); }
-.input-lg { min-height: 54px; font-size: 18px; font-weight: 500; letter-spacing: -.01em; }
 .input-mono { font-family: var(--font-mono); font-size: 17px; letter-spacing: .08em; }
-/* Date fields keep the native picker but sit flush left like every other input. */
-.input-date { -webkit-appearance: none; appearance: none; text-align: left; }
-.input-date::-webkit-date-and-time-value { text-align: left; }
-.input-date::-webkit-calendar-picker-indicator { opacity: .55; cursor: pointer; }
-/* A fixed prefix (the country code) drawn inside the input, split off by a hairline. */
-.input-group { position: relative; }
-.input-prefix { position: absolute; top: 50%; left: 14px; padding-right: 12px; border-right: 1px solid var(--line); color: var(--faint); font-size: 16px; line-height: 1.25; transform: translateY(-50%); pointer-events: none; }
-.input-group .input { padding-left: 78px; }
-.field + .field { margin-top: 18px; }
-.field:last-of-type { margin-bottom: 22px; }
-.field:last-of-type .field-hint { margin-bottom: 0; }
+/*
+  Grouped fields, as in Stripe's checkout: one bordered block, hairlines between rows, each label on the left of its input.
+  The whole block takes the focus ring; a row with a problem turns its label red and the messages gather below.
+*/
+.form-label { margin-bottom: 8px; color: var(--ink); font-size: 14px; font-weight: 600; }
+.field-group { border-radius: 10px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-2), var(--shadow-sm); transition: box-shadow .15s; }
+.field-group:focus-within { box-shadow: inset 0 0 0 1px var(--brand), 0 0 0 4px rgb(83 58 253 / .16); }
+.field-row { display: flex; align-items: center; min-height: 52px; padding: 0 14px; }
+.field-row + .field-row { border-top: 1px solid var(--line); }
+.field-row label { flex: 0 0 108px; color: var(--muted); font-size: 14px; font-weight: 500; cursor: text; }
+.field-row:focus-within label { color: var(--brand); }
+.field-row.is-invalid label { color: var(--danger); }
+.field-row input { flex: 1; min-width: 0; height: 50px; padding: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 16px; outline: none; }
+.field-row input::placeholder { color: #8898aa; }
+.field-row input[type="date"] { -webkit-appearance: none; appearance: none; text-align: left; }
+.field-row input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+.field-row input[type="date"]::-webkit-calendar-picker-indicator { opacity: .5; cursor: pointer; }
+.field-prefix { margin-right: 8px; color: var(--faint); font-size: 16px; }
+.field-errors { display: grid; gap: 2px; margin: 10px 0 12px; }
+.field-errors .field-error { margin-top: 0; }
 .callout { display: flex; gap: 12px; margin-top: 24px; padding: 14px 16px; border-radius: 10px; background: var(--gold-tint); box-shadow: inset 0 0 0 1px #f5d9a3; font-size: 14.5px; line-height: 1.55; }
 .callout > svg { flex-shrink: 0; margin-top: 2px; color: var(--gold-ink); }
 .callout a { color: var(--brand); font-weight: 600; }
 
 /* ───────────── Join ───────────── */
 .join-hero .hero-inner { padding-top: 28px; }
-.join-form { margin-top: 28px; }
+.join-form { margin-top: 32px; }
 .join-preview { margin-top: 28px; }
 .join-preview-note { justify-content: center; gap: 8px; }
 .join-preview-note svg { flex-shrink: 0; color: var(--brand); }

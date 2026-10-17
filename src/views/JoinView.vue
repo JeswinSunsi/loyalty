@@ -7,7 +7,8 @@ import LoyaltyCard from '../components/LoyaltyCard.vue';
 import HoverArrow from '../components/HoverArrow.vue';
 import { createCard, memberCard, PHONE_PREFIX } from '../store';
 
-type Field = 'name' | 'birthDate' | 'phone';
+const fields = ['name', 'birthDate', 'phone'] as const;
+type Field = typeof fields[number];
 const router = useRouter();
 const form = reactive({ name: '', birthDate: '', phone: '' });
 const errors = reactive<Record<Field, string>>({ name: '', birthDate: '', phone: '' });
@@ -26,7 +27,7 @@ function check(): Field | null {
     : form.birthDate > maxBirthDate || form.birthDate < minBirthDate ? 'Please check your date of birth.' : '';
   // Omani mobile numbers are 8 digits and start with 7 or 9.
   errors.phone = /^[79]\d{7}$/.test(form.phone.replace(/\D/g, '')) ? '' : 'Please enter an 8-digit mobile number.';
-  return (['name', 'birthDate', 'phone'] as const).find(field => errors[field]) ?? null;
+  return fields.find(field => errors[field]) ?? null;
 }
 async function submit() {
   const firstError = check();
@@ -38,8 +39,8 @@ async function submit() {
   createCard(form);
   void router.push({ path: '/card/', query: { welcome: '1' } });
 }
-function describedBy(field: Field, hint = '') {
-  return [hint, errors[field] ? `${field}-error` : ''].filter(Boolean).join(' ') || undefined;
+function describedBy(field: Field) {
+  return errors[field] ? `${field}-error` : undefined;
 }
 </script>
 <template>
@@ -58,36 +59,37 @@ function describedBy(field: Field, hint = '') {
             <p>This phone already has a card with {{ memberCard.marks }} of 3 stamps. <RouterLink to="/card/">Open it</RouterLink>. Making a new card will replace it.</p>
           </div>
 
-          <form class="panel join-form" novalidate @submit.prevent="submit">
-            <div class="field">
-              <label for="member-name" class="field-label">Your name</label>
-              <input
-                id="member-name" v-model="form.name" class="input" required autocomplete="name" maxlength="40" placeholder="e.g. Layla"
-                :aria-invalid="!!errors.name" :aria-describedby="describedBy('name')" @input="errors.name = ''"
-              />
-              <p v-if="errors.name" id="name-error" class="field-error" role="alert">{{ errors.name }}</p>
-            </div>
-
-            <div class="field">
-              <label for="member-birthDate" class="field-label">Date of birth</label>
-              <input
-                id="member-birthDate" v-model="form.birthDate" class="input input-date" type="date" required autocomplete="bday" :min="minBirthDate" :max="maxBirthDate"
-                :aria-invalid="!!errors.birthDate" :aria-describedby="describedBy('birthDate')" @input="errors.birthDate = ''"
-              />
-              <p v-if="errors.birthDate" id="birthDate-error" class="field-error" role="alert">{{ errors.birthDate }}</p>
-            </div>
-
-            <div class="field">
-              <label for="member-phone" class="field-label">Phone number</label>
-              <div class="input-group">
-                <span class="input-prefix" aria-hidden="true">{{ PHONE_PREFIX }}</span>
+          <form class="join-form" novalidate @submit.prevent="submit">
+            <p id="details-label" class="form-label">Your details</p>
+            <!-- One joined block, label on the left of each row, as in Stripe's checkout. -->
+            <div class="field-group" role="group" aria-labelledby="details-label">
+              <div class="field-row" :class="{ 'is-invalid': errors.name }">
+                <label for="member-name">Name</label>
                 <input
-                  id="member-phone" v-model="form.phone" class="input" type="tel" inputmode="numeric" required autocomplete="tel-national" maxlength="9" placeholder="9123 4567"
-                  :aria-invalid="!!errors.phone" :aria-describedby="describedBy('phone', 'phone-hint')" @input="errors.phone = ''"
+                  id="member-name" v-model="form.name" required autocomplete="name" maxlength="40" placeholder="Full name"
+                  :aria-invalid="!!errors.name" :aria-describedby="describedBy('name')" @input="errors.name = ''"
                 />
               </div>
-              <p v-if="errors.phone" id="phone-error" class="field-error" role="alert">{{ errors.phone }}</p>
-              <p id="phone-hint" class="field-hint">Your Oman mobile number, without the {{ PHONE_PREFIX }}.</p>
+              <div class="field-row" :class="{ 'is-invalid': errors.birthDate }">
+                <label for="member-birthDate">Date of birth</label>
+                <input
+                  id="member-birthDate" v-model="form.birthDate" type="date" required autocomplete="bday" :min="minBirthDate" :max="maxBirthDate"
+                  :aria-invalid="!!errors.birthDate" :aria-describedby="describedBy('birthDate')" @input="errors.birthDate = ''"
+                />
+              </div>
+              <div class="field-row" :class="{ 'is-invalid': errors.phone }">
+                <label for="member-phone">Phone</label>
+                <span class="field-prefix" aria-hidden="true">{{ PHONE_PREFIX }}</span>
+                <input
+                  id="member-phone" v-model="form.phone" type="tel" inputmode="numeric" required autocomplete="tel-national" maxlength="9" placeholder="9123 4567"
+                  :aria-invalid="!!errors.phone" :aria-describedby="describedBy('phone')" @input="errors.phone = ''"
+                />
+              </div>
+            </div>
+            <div class="field-errors">
+              <template v-for="field in fields" :key="field">
+                <p v-if="errors[field]" :id="`${field}-error`" class="field-error" role="alert">{{ errors[field] }}</p>
+              </template>
             </div>
 
             <button class="btn btn-brand btn-lg btn-block">Create my card <HoverArrow /></button>
