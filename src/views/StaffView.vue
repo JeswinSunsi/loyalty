@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ArrowRight, Check, Gift, RotateCcw, ScanLine, Search, Stamp } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
-import { addStamp, findCard, formatCardNumber, memberCard, redeemGift, restoreCard, STAMP_TARGET, type MemberCard } from '../store';
+import { addStamp, findCard, formatCardNumber, formatPhone, memberCard, redeemGift, restoreCard, STAMP_TARGET, type MemberCard } from '../store';
 
 const route = useRoute();
 const router = useRouter();
@@ -82,6 +82,7 @@ function nextCustomer() {
             <div class="customer-id">
               <h2 id="customer-name">{{ card.name }}</h2>
               <p>Card {{ formatCardNumber(card.number) }}</p>
+              <p v-if="card.phone">{{ formatPhone(card.phone) }}</p>
             </div>
             <span class="badge" :class="{ 'badge-gold': card.marks === STAMP_TARGET }">{{ card.marks === STAMP_TARGET ? 'Gift ready' : `${card.marks} of ${STAMP_TARGET}` }}</span>
           </div>

@@ -1,18 +1,45 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { nextTick, reactive } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { ArrowLeft, Gift, Info } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
 import LoyaltyCard from '../components/LoyaltyCard.vue';
 import HoverArrow from '../components/HoverArrow.vue';
-import { createCard, memberCard } from '../store';
+import { createCard, memberCard, PHONE_PREFIX } from '../store';
+
+type Field = 'name' | 'birthDate' | 'phone';
 const router = useRouter();
-const name = ref('');
-const error = ref('');
-function submit() {
-  if (!name.value.trim()) { error.value = 'Please type your name.'; return; }
-  createCard(name.value);
+const form = reactive({ name: '', birthDate: '', phone: '' });
+const errors = reactive<Record<Field, string>>({ name: '', birthDate: '', phone: '' });
+
+// Birth dates run from 120 years ago up to today, in the visitor's own calendar day.
+function isoDay(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+const today = new Date();
+const maxBirthDate = isoDay(today);
+const minBirthDate = isoDay(new Date(today.getFullYear() - 120, today.getMonth(), today.getDate()));
+
+function check(): Field | null {
+  errors.name = form.name.trim() ? '' : 'Please type your name.';
+  errors.birthDate = !form.birthDate ? 'Please add your date of birth.'
+    : form.birthDate > maxBirthDate || form.birthDate < minBirthDate ? 'Please check your date of birth.' : '';
+  // Omani mobile numbers are 8 digits and start with 7 or 9.
+  errors.phone = /^[79]\d{7}$/.test(form.phone.replace(/\D/g, '')) ? '' : 'Please enter an 8-digit mobile number.';
+  return (['name', 'birthDate', 'phone'] as const).find(field => errors[field]) ?? null;
+}
+async function submit() {
+  const firstError = check();
+  if (firstError) {
+    await nextTick();
+    document.getElementById(`member-${firstError}`)?.focus();
+    return;
+  }
+  createCard(form);
   void router.push({ path: '/card/', query: { welcome: '1' } });
+}
+function describedBy(field: Field, hint = '') {
+  return [hint, errors[field] ? `${field}-error` : ''].filter(Boolean).join(' ') || undefined;
 }
 </script>
 <template>
@@ -23,8 +50,8 @@ function submit() {
         <section class="join-copy">
           <RouterLink to="/" class="back-link"><ArrowLeft :size="16" aria-hidden="true" /> Back</RouterLink>
           <p class="eyebrow"><span class="eyebrow-tag">Free</span> Your rewards card</p>
-          <h1 class="display">What’s your<br /><span>name?</span></h1>
-          <p class="lede">We’ll put it on your card. It’s the only thing we ask for.</p>
+          <h1 class="display">Get your<br /><span>free card.</span></h1>
+          <p class="lede">Fill in your details and your card is ready right away.</p>
 
           <div v-if="memberCard" class="callout" role="note">
             <Info :size="18" aria-hidden="true" />
@@ -32,13 +59,37 @@ function submit() {
           </div>
 
           <form class="panel join-form" novalidate @submit.prevent="submit">
-            <label for="member-name" class="field-label">Your name</label>
-            <input
-              id="member-name" v-model="name" class="input input-lg" required autocomplete="given-name" maxlength="40" placeholder="e.g. Layla"
-              :aria-invalid="!!error" :aria-describedby="error ? 'name-hint name-error' : 'name-hint'" @input="error = ''"
-            />
-            <p v-if="error" id="name-error" class="field-error" role="alert">{{ error }}</p>
-            <p id="name-hint" class="field-hint">Your first name or a nickname is fine.</p>
+            <div class="field">
+              <label for="member-name" class="field-label">Your name</label>
+              <input
+                id="member-name" v-model="form.name" class="input" required autocomplete="name" maxlength="40" placeholder="e.g. Layla"
+                :aria-invalid="!!errors.name" :aria-describedby="describedBy('name')" @input="errors.name = ''"
+              />
+              <p v-if="errors.name" id="name-error" class="field-error" role="alert">{{ errors.name }}</p>
+            </div>
+
+            <div class="field">
+              <label for="member-birthDate" class="field-label">Date of birth</label>
+              <input
+                id="member-birthDate" v-model="form.birthDate" class="input input-date" type="date" required autocomplete="bday" :min="minBirthDate" :max="maxBirthDate"
+                :aria-invalid="!!errors.birthDate" :aria-describedby="describedBy('birthDate')" @input="errors.birthDate = ''"
+              />
+              <p v-if="errors.birthDate" id="birthDate-error" class="field-error" role="alert">{{ errors.birthDate }}</p>
+            </div>
+
+            <div class="field">
+              <label for="member-phone" class="field-label">Phone number</label>
+              <div class="input-group">
+                <span class="input-prefix" aria-hidden="true">{{ PHONE_PREFIX }}</span>
+                <input
+                  id="member-phone" v-model="form.phone" class="input" type="tel" inputmode="numeric" required autocomplete="tel-national" maxlength="9" placeholder="9123 4567"
+                  :aria-invalid="!!errors.phone" :aria-describedby="describedBy('phone', 'phone-hint')" @input="errors.phone = ''"
+                />
+              </div>
+              <p v-if="errors.phone" id="phone-error" class="field-error" role="alert">{{ errors.phone }}</p>
+              <p id="phone-hint" class="field-hint">Your Oman mobile number, without the {{ PHONE_PREFIX }}.</p>
+            </div>
+
             <button class="btn btn-brand btn-lg btn-block">Create my card <HoverArrow /></button>
           </form>
         </section>
@@ -46,7 +97,7 @@ function submit() {
 
       <aside class="showcase join-preview" aria-label="Card preview">
         <div class="container">
-          <LoyaltyCard :name="name.trim() || 'Your name'" :marks="0" />
+          <LoyaltyCard :name="form.name.trim() || 'Your name'" :marks="0" />
           <p class="try-caption join-preview-note"><Gift :size="16" aria-hidden="true" /> Fill it with three stamps for a free gift.</p>
         </div>
       </aside>

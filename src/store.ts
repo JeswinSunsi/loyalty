@@ -3,7 +3,10 @@ import { ref } from 'vue';
 export const STAMP_TARGET = 3;
 export type ActivityKind = 'created' | 'stamp' | 'redeemed';
 export type Activity = { id: string; kind: ActivityKind; text: string; at: string };
-export type MemberCard = { number: string; name: string; marks: number; since: string; activity: Activity[] };
+// Phone (8 local digits, Oman) and birth date (YYYY-MM-DD) are optional so cards made before they were asked for still load.
+export type MemberCard = { number: string; name: string; phone?: string; birthDate?: string; marks: number; since: string; activity: Activity[] };
+export type NewMember = { name: string; phone: string; birthDate: string };
+export const PHONE_PREFIX = '+968';
 const storageKey = 'm-souq-rewards-card';
 
 function valid(saved: unknown): saved is MemberCard {
@@ -48,8 +51,14 @@ export function findCard(input: string) {
   const digits = input.replace(/\D/g, '');
   return !!digits && memberCard.value?.number === digits;
 }
-export function createCard(name: string) {
-  memberCard.value = { number: newCardNumber(), name: name.trim().replace(/\s+/g, ' ').slice(0, 40), marks: 0, since: new Date().toISOString(), activity: [] };
+export function formatPhone(phone: string) {
+  return `${PHONE_PREFIX} ${phone.replace(/(\d{4})(?=\d)/g, '$1 ')}`;
+}
+export function createCard({ name, phone, birthDate }: NewMember) {
+  memberCard.value = {
+    number: newCardNumber(), name: name.trim().replace(/\s+/g, ' ').slice(0, 40), phone: phone.replace(/\D/g, ''), birthDate,
+    marks: 0, since: new Date().toISOString(), activity: [],
+  };
   record('created', 'Card created');
 }
 export function addStamp() {
