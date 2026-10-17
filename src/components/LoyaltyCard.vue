@@ -108,7 +108,7 @@ const label = computed(() => flipped.value
                       <svg v-if="qr" :viewBox="`-1 -1 ${qr.size + 2} ${qr.size + 2}`" shape-rendering="crispEdges" role="img" aria-label="Your rewards code">
                         <path :d="qr.path" fill="currentColor" />
                       </svg>
-                      <span v-else class="lc-qr-msg">Read your card number at the till</span>
+                      <span v-else class="lc-qr-msg">Read your card number at the counter</span>
                       <span class="lc-scan" aria-hidden="true" />
                     </div>
                   </div>

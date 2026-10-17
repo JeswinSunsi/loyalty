@@ -48,7 +48,7 @@ const groups = [
       <div class="footer-bottom">
         <p>© {{ year }} M Souq LLC. All rights reserved.</p>
         <p class="footer-made">
-          Designed with precision in Muscat.
+          Designed with love in Muscat.
           <a :href="whatsapp" target="_blank" rel="noopener" class="footer-wa" aria-label="Message M Souq on WhatsApp">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.4z" /><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.6-2-1-1 .8a4.5 4.5 0 0 1-2.2-2.2l.8-1-1-2z" /></svg>
           </a>

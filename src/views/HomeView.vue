@@ -32,11 +32,11 @@ const gifts = [
   { icon: Headphones, name: 'Earbuds', note: 'Wireless, with a charging case' },
   { icon: Watch, name: 'Smart band', note: 'Tracks steps, sleep and heart rate' },
   { icon: PenTool, name: 'Cleaning pen', note: 'For screens, camera lenses and earbuds' },
-  { icon: Sparkles, name: 'More in store', note: 'Ask at the till to see what’s in today', more: true },
+  { icon: Sparkles, name: 'More in store', note: 'Ask at the counter to see what’s in today', more: true },
 ];
 const faqs = [
-  { q: 'Does every purchase count?', a: 'Most do. Ask at the till and we’ll tell you before we stamp your card.' },
-  { q: 'How do I get my gift?', a: 'Once you have three stamps, show your card at the till and pick a gift. We’ll reset your card so you can start collecting again.' },
+  { q: 'Does every purchase count?', a: 'Most do. Ask at the counter and we’ll tell you before we stamp your card.' },
+  { q: 'How do I get my gift?', a: 'Once you have three stamps, show your card at the counter and pick a gift. We’ll reset your card so you can start collecting again.' },
   { q: 'Where is my card saved?', a: 'In the browser on the phone you signed up with. Open this site on that phone and your card will be there. No app, no password.' },
   { q: 'Is there a limit on gifts?', a: 'No. Every time you fill a card, you get another gift.' },
 ];
@@ -136,8 +136,8 @@ const faqs = [
       <section class="closing" aria-labelledby="closing-heading">
         <div class="container">
           <template v-if="memberCard">
-            <h2 id="closing-heading" class="title">Bring your card <span>next time you shop.</span></h2>
-            <p class="closing-lede">Show it at the till and we’ll add your stamp.</p>
+            <h2 id="closing-heading" class="title">Get rewarded <span>every time you shop.</span></h2>
+            <p class="closing-lede">Show your card at the counter and we’ll add your stamp.</p>
           </template>
           <template v-else>
             <h2 id="closing-heading" class="title">Get your card <span>before you shop.</span></h2>
@@ -148,7 +148,7 @@ const faqs = [
               {{ memberCard ? 'Open my card' : 'Get my card' }} <HoverArrow />
             </RouterLink>
           </div>
-          <p class="closing-fine">No app. No password. Just your name.</p>
+          <p class="closing-fine">No app. No hassle.</p>
         </div>
       </section>
     </main>

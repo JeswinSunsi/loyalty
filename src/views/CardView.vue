@@ -22,9 +22,9 @@ const firstName = computed(() => memberCard.value?.name.split(' ')[0] ?? '');
 const headline = computed(() => ready.value ? ['Your gift', 'is ready.']
   : remaining.value === 1 ? ['One more stamp', 'until your gift.']
   : [`${['', 'One', 'Two', 'Three'][remaining.value]} more stamps`, 'until your gift.']);
-const lede = computed(() => welcome.value ? 'Next time you shop, tap your card at the till and we’ll add your first stamp.'
-  : ready.value ? 'Tap your card at the till and pick something from the gift shelf.'
-  : 'Tap your card at the till. We’ll scan it and add your stamp.');
+const lede = computed(() => welcome.value ? 'Next time you shop, tap your card at the counter and we’ll add your first stamp.'
+  : ready.value ? 'Tap your card at the counter and pick something from the gift shelf.'
+  : 'Tap your card at the counter. We’ll scan it and add your stamp.');
 
 const showCode = ref(false);
 const qr = computed(() => {
@@ -79,7 +79,7 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
               <div class="try-caption">
                 <p aria-live="polite">
                   <template v-if="showCode">Show this to the cashier.</template>
-                  <template v-else-if="ready">Your card is full. Tap it to collect your gift.</template>
+                  <template v-else-if="ready">Tap to collect your gift.</template>
                   <template v-else>Tap your card to show your code.</template>
                 </p>
                 <button type="button" class="chip chip-button" :aria-pressed="showCode" @click="showCode = !showCode">
@@ -126,7 +126,7 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
         <section class="closing" aria-labelledby="closing-heading">
           <div class="container">
             <template v-if="ready">
-              <h2 id="closing-heading" class="title">Your gift is waiting <span>at the till.</span></h2>
+              <h2 id="closing-heading" class="title">Your gift is waiting <span>at the counter.</span></h2>
               <p class="closing-lede">Show your code and pick something from the shelf.</p>
               <div class="cta-row">
                 <button type="button" class="btn btn-light btn-lg" @click="presentCode">Show my code <HoverArrow /></button>
