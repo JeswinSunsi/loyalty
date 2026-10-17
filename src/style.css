@@ -249,11 +249,7 @@ main:focus { outline: none; }
 .showcase { position: relative; margin-top: 36px; padding-block: 12px 36px; }
 .showcase::before { content: ""; position: absolute; inset: 30% 0 18%; background: var(--band); transform: skewY(-7deg); transform-origin: 0 50%; }
 .showcase > .container { position: relative; }
-.try-card { border-radius: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.try-card:focus-visible { outline-offset: 6px; border-radius: 18px; }
-.try-card.is-thump .lc { animation: thump .28s ease-out; }
 .try-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; color: var(--ink-2); font-size: 14.5px; font-weight: 500; line-height: 1.4; }
-@keyframes thump { 35% { transform: scale(.985); } }
 
 /* Facts: Stripe's stats band, small numbers set large */
 .facts { padding-block: 40px 8px; }
@@ -402,10 +398,6 @@ main:focus { outline: none; }
 
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
 
-@media (hover: hover) {
-  .try-card:hover .lc { transform: translateY(-2px); }
-  .try-card .lc { transition: transform .25s var(--ease-out); }
-}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

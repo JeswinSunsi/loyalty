@@ -20,11 +20,11 @@ const ready = computed(() => remaining.value === 0);
 const firstName = computed(() => memberCard.value?.name.split(' ')[0] ?? '');
 // Headlines run in two tones like the front page: the news, then the softer half.
 const headline = computed(() => ready.value ? ['Your gift', 'is ready.']
-  : remaining.value === 1 ? ['One more', 'stamp to go.']
-  : [`${['', 'One', 'Two', 'Three'][remaining.value]} stamps`, 'to your gift.']);
-const lede = computed(() => welcome.value ? 'At checkout, tap your card to show your code and collect your first stamp.'
-  : ready.value ? 'Tap your card to show your code, then choose your gift at the till.'
-  : 'Tap your card at the till to show your code. The team scans it and adds your stamp.');
+  : remaining.value === 1 ? ['One more stamp', 'until your gift.']
+  : [`${['', 'One', 'Two', 'Three'][remaining.value]} more stamps`, 'until your gift.']);
+const lede = computed(() => welcome.value ? 'Next time you shop, tap your card at the till and we’ll add your first stamp.'
+  : ready.value ? 'Tap your card at the till and pick something from the gift shelf.'
+  : 'Tap your card at the till. We’ll scan it and add your stamp.');
 
 const showCode = ref(false);
 const qr = computed(() => {
@@ -41,9 +41,9 @@ function presentCode() {
 }
 
 const kinds: Record<ActivityKind, { icon: typeof Stamp; item: string; amount: string }> = {
-  created: { icon: Sparkles, item: 'Card opened', amount: 'New' },
-  stamp: { icon: Stamp, item: 'Stamp added', amount: '+1' },
-  redeemed: { icon: Gift, item: 'Free gift', amount: '−3' },
+  created: { icon: Sparkles, item: 'Card created', amount: 'New' },
+  stamp: { icon: Stamp, item: 'Stamp', amount: '+1' },
+  redeemed: { icon: Gift, item: 'Gift collected', amount: '−3' },
 };
 const dateFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' });
 const timeFormat = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
@@ -63,10 +63,10 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
           <div class="container hero-inner">
             <p v-if="!storageAvailable" class="callout" role="status">This browser isn’t letting us save your card. Your stamps may not be here next time.</p>
             <p class="eyebrow">
-              <template v-if="welcome"><span class="eyebrow-tag">New</span> Welcome to M Souq Rewards</template>
+              <template v-if="welcome"><span class="eyebrow-tag">New</span> Your card is ready</template>
               <template v-else>Hi, {{ firstName }}</template>
             </p>
-            <h1 v-if="welcome" class="display">You’re in,<br /><span class="display-name">{{ firstName }}.</span></h1>
+            <h1 v-if="welcome" class="display">Welcome,<br /><span class="display-name">{{ firstName }}.</span></h1>
             <h1 v-else class="display" aria-live="polite">{{ headline[0] }}<br /><span>{{ headline[1] }}</span></h1>
             <p class="lede">{{ lede }}</p>
           </div>
@@ -78,9 +78,9 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
               </div>
               <div class="try-caption">
                 <p aria-live="polite">
-                  <template v-if="showCode">Hold your screen up to the scanner at the till.</template>
-                  <template v-else-if="ready">Your card is full. Tap it to redeem your gift.</template>
-                  <template v-else>Tap your card to show your checkout code.</template>
+                  <template v-if="showCode">Show this to the cashier.</template>
+                  <template v-else-if="ready">Your card is full. Tap it to collect your gift.</template>
+                  <template v-else>Tap your card to show your code.</template>
                 </p>
                 <button type="button" class="chip chip-button" :aria-pressed="showCode" @click="showCode = !showCode">
                   <QrCode :size="14" aria-hidden="true" /> Code
@@ -93,8 +93,8 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
 
         <section class="section" aria-labelledby="activity-heading">
           <div class="container">
-            <p class="kicker">Your activity</p>
-            <h2 id="activity-heading" class="title">Every stamp, <span>the moment it’s added.</span></h2>
+            <p class="kicker">History</p>
+            <h2 id="activity-heading" class="title">Your stamps <span>and gifts.</span></h2>
 
             <div class="panel activity">
               <dl class="summary">
@@ -126,17 +126,17 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
         <section class="closing" aria-labelledby="closing-heading">
           <div class="container">
             <template v-if="ready">
-              <h2 id="closing-heading" class="title">Your free gift <span>is waiting.</span></h2>
-              <p class="closing-lede">Show your code at the till and choose from the gift shelf.</p>
+              <h2 id="closing-heading" class="title">Your gift is waiting <span>at the till.</span></h2>
+              <p class="closing-lede">Show your code and pick something from the shelf.</p>
               <div class="cta-row">
                 <button type="button" class="btn btn-light btn-lg" @click="presentCode">Show my code <HoverArrow /></button>
               </div>
             </template>
             <template v-else>
-              <h2 id="closing-heading" class="title">Pick your gift <span>when the card’s full.</span></h2>
-              <p class="closing-lede">Cleaning pens, smart bands, earbuds and more. The shelf changes with the season.</p>
+              <h2 id="closing-heading" class="title">See what you <span>could get.</span></h2>
+              <p class="closing-lede">Earbuds, smart bands, cleaning pens and more.</p>
               <div class="cta-row">
-                <RouterLink :to="{ path: '/', hash: '#gifts' }" class="btn btn-light btn-lg">See the gift shelf <HoverArrow /></RouterLink>
+                <RouterLink :to="{ path: '/', hash: '#gifts' }" class="btn btn-light btn-lg">See the gifts <HoverArrow /></RouterLink>
               </div>
             </template>
           </div>
@@ -146,10 +146,10 @@ const sinceLabel = computed(() => memberCard.value ? new Intl.DateTimeFormat(und
       <section v-else class="hero member-hero">
         <div class="container hero-inner">
           <p class="eyebrow">My card</p>
-          <h1 class="display">No card<br /><span>here yet.</span></h1>
-          <p class="lede">Your card is saved in the browser where you made it. Haven’t got one? It takes a few seconds.</p>
+          <h1 class="display">No card<br /><span>on this phone.</span></h1>
+          <p class="lede">Your card is saved in the browser you signed up on. Don’t have one yet? It’s free and takes about ten seconds.</p>
           <div class="cta-row">
-            <RouterLink to="/join/" class="btn btn-brand btn-lg">Get your free card <HoverArrow /></RouterLink>
+            <RouterLink to="/join/" class="btn btn-brand btn-lg">Get my card <HoverArrow /></RouterLink>
           </div>
         </div>
         <div class="showcase">

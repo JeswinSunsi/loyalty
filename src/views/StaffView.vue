@@ -29,16 +29,16 @@ function snapshot() { previous = JSON.parse(JSON.stringify(memberCard.value)) as
 function stamp() {
   if (changed.value) return;
   snapshot();
-  if (addStamp()) { changed.value = true; notice.value = memberCard.value?.marks === STAMP_TARGET ? 'Stamp added. This card now has a free gift ready.' : 'Stamp added.'; }
+  if (addStamp()) { changed.value = true; notice.value = memberCard.value?.marks === STAMP_TARGET ? 'Stamp added. This card is full, so they can pick a gift.' : 'Stamp added.'; }
 }
 function redeem() {
   snapshot();
-  if (redeemGift()) { changed.value = true; confirming.value = false; notice.value = 'Gift redeemed. Their new card starts at zero.'; }
+  if (redeemGift()) { changed.value = true; confirming.value = false; notice.value = 'Gift given. Their card is back to zero.'; }
 }
 function undo() {
   if (previous) restoreCard(previous);
   reset();
-  notice.value = 'Undone. The card is back to how it was.';
+  notice.value = 'Undone.';
 }
 function nextCustomer() {
   reset();
@@ -55,13 +55,13 @@ function nextCustomer() {
     <main id="main-content" class="container staff">
       <header class="staff-head">
         <p class="kicker">Checkout</p>
-        <h1 class="headline">{{ card ? 'Customer card' : 'Find a customer card' }}</h1>
+        <h1 class="headline">{{ card ? 'Customer card' : 'Find a card' }}</h1>
       </header>
 
       <div class="staff-stack">
         <section class="panel lookup" aria-labelledby="lookup-title">
           <h2 id="lookup-title" class="panel-title">Look up a card</h2>
-          <p class="panel-sub">Scanning the customer’s code opens their card here. Or type the number printed under it.</p>
+          <p class="panel-sub">Scan the customer’s code or type the number under it.</p>
           <form class="lookup-form" novalidate @submit.prevent="lookup">
             <label for="card-number" class="field-label">Card number</label>
             <div class="lookup-row">
@@ -73,7 +73,7 @@ function nextCustomer() {
             </div>
             <p v-if="lookupError" id="lookup-error" class="field-error" role="alert">{{ lookupError }}</p>
           </form>
-          <div class="scan-hint"><ScanLine :size="20" aria-hidden="true" /><span>Use your phone camera on the customer’s code</span></div>
+          <div class="scan-hint"><ScanLine :size="20" aria-hidden="true" /><span>Scan with your phone camera</span></div>
         </section>
 
         <section v-if="card" class="panel customer" aria-labelledby="customer-name">
@@ -95,11 +95,11 @@ function nextCustomer() {
 
           <div class="staff-action">
             <div v-if="confirming" class="confirm" role="group" aria-labelledby="confirm-title">
-              <h3 id="confirm-title">Hand over a free gift?</h3>
-              <p>Make sure the customer has picked a gift. This uses all three stamps and starts a new card.</p>
+              <h3 id="confirm-title">Give a free gift?</h3>
+              <p>Check they’ve picked a gift first. This uses their three stamps and resets the card.</p>
               <div class="confirm-actions">
                 <button class="btn btn-ghost" @click="confirming = false">Cancel</button>
-                <button class="btn btn-brand" @click="redeem"><Gift :size="17" aria-hidden="true" /> Confirm redemption</button>
+                <button class="btn btn-brand" @click="redeem"><Gift :size="17" aria-hidden="true" /> Give gift</button>
               </div>
             </div>
             <template v-else>
@@ -108,11 +108,11 @@ function nextCustomer() {
                 <button v-if="changed" class="notice-undo" @click="undo"><RotateCcw :size="14" aria-hidden="true" /> Undo</button>
               </div>
               <template v-if="card.marks === STAMP_TARGET">
-                <p v-if="!notice" class="action-hint">Ask the customer to choose from the gifts in store.</p>
-                <button class="btn btn-brand btn-lg btn-block" @click="confirming = true"><Gift :size="18" aria-hidden="true" /> Redeem free gift</button>
+                <p v-if="!notice" class="action-hint">Ask the customer to pick a gift from the shelf.</p>
+                <button class="btn btn-brand btn-lg btn-block" @click="confirming = true"><Gift :size="18" aria-hidden="true" /> Give free gift</button>
               </template>
               <template v-else-if="!changed">
-                <p class="action-hint">Confirm the purchase qualifies, then add one stamp.</p>
+                <p class="action-hint">If the purchase counts, add one stamp.</p>
                 <button class="btn btn-primary btn-lg btn-block" @click="stamp"><Stamp :size="18" aria-hidden="true" /> Add stamp</button>
               </template>
             </template>
