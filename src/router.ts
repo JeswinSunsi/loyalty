@@ -6,7 +6,7 @@ const loadCardView = () => import('./views/CardView.vue');
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/', component: () => import('./views/HomeView.vue'), meta: { title: 'Three stamps. One free gift.' } },
+    { path: '/', component: () => import('./views/HomeView.vue'), meta: { title: 'Free gifts when you shop' } },
     { path: '/join/', component: () => import('./views/JoinView.vue'), meta: { title: 'Get your card' } },
     { path: '/card/', component: loadCardView, meta: { title: 'My card' } },
     { path: '/staff/', component: () => import('./views/StaffView.vue'), meta: { title: 'Staff checkout' } },

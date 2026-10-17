@@ -276,6 +276,8 @@ main:focus { outline: none; }
 .r-rule { margin: 16px 0; border: 0; border-top: 1.5px dashed var(--line-2); }
 .r-lines { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
 .r-lines li { display: grid; grid-template-columns: auto auto 1fr auto; column-gap: 8px; align-items: baseline; }
+/* How it works on the front page: just the step, its leader and what it earns. */
+.r-steps li { grid-template-columns: auto 1fr auto; }
 .r-n { color: var(--muted); }
 .r-item { font-weight: 600; text-transform: uppercase; }
 .r-dots { align-self: end; min-width: 12px; margin-bottom: .32em; border-bottom: 1.5px dotted var(--line-2); }

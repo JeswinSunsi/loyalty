@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { ArrowRight, Headphones, PenTool, Plus, RotateCcw, Scissors, Sparkles, Stamp, Watch } from '@lucide/vue';
 import SiteHeader from '../components/SiteHeader.vue';
@@ -20,29 +20,24 @@ function stampIt() {
   thumpTimer = window.setTimeout(() => { thump.value = false; }, 400);
 }
 onBeforeUnmount(() => window.clearTimeout(thumpTimer));
-const tryCaption = computed(() => [
-  'A fresh card. Tap it to press your first stamp.',
-  'One stamp down. Tap again.',
-  'Two down. One more for a free gift.',
-  'Card full. That’s a free gift.',
-][tryMarks.value]);
 
-const visits = [
-  { note: 'Shop as usual. Ask the team if your purchase earns a stamp.' },
-  { note: 'Open your card at the till. The team scans it and adds a stamp.' },
-  { note: 'Third stamp fills the card. Pick your gift on the spot.' },
+// How it works, rung up as a till receipt.
+const steps = [
+  { title: 'Make your card', amount: 'Free' },
+  { title: 'Shop at M Souq', amount: '+1 stamp' },
+  { title: 'Get rewards', amount: 'Gift' },
 ];
 const gifts = [
-  { icon: PenTool, name: 'Cleaning pen', note: 'For screens, lenses and earbuds' },
-  { icon: Watch, name: 'Smart band', note: 'Steps, sleep and heart rate' },
-  { icon: Headphones, name: 'Earbuds', note: 'Wireless, with charging case' },
-  { icon: Sparkles, name: 'And more', note: 'New picks arrive with the season', more: true },
+  { icon: Headphones, name: 'Earbuds', note: 'Wireless, with a charging case' },
+  { icon: Watch, name: 'Smart band', note: 'Tracks steps, sleep and heart rate' },
+  { icon: PenTool, name: 'Cleaning pen', note: 'For screens, camera lenses and earbuds' },
+  { icon: Sparkles, name: 'More in store', note: 'Ask at the counter to see what’s in today', more: true },
 ];
 const faqs = [
-  { q: 'Which purchases earn a stamp?', a: 'Ask the M Souq team at checkout. They’ll confirm whether your purchase earns a stamp before adding it to your card.' },
-  { q: 'How do I collect my free gift?', a: 'Once your card has three stamps, show it at checkout and choose a gift from the current selection. The team redeems your stamps and a fresh card begins.' },
-  { q: 'Where is my card kept?', a: 'Your card lives in the browser you created it in. Open this site on the same phone at checkout and your card will be right there. No app or password needed.' },
-  { q: 'Can I collect more than one gift?', a: 'Yes. Every time you fill a card with three stamps, you earn another free gift.' },
+  { q: 'Does every purchase count?', a: 'Most do. Ask at the counter and we’ll tell you before we stamp your card.' },
+  { q: 'How do I get my gift?', a: 'Once you have three stamps, show your card at the counter and pick a gift. We’ll reset your card so you can start collecting again.' },
+  { q: 'Where is my card saved?', a: 'In the browser on the phone you signed up with. Open this site on that phone and your card will be there. No app, no password.' },
+  { q: 'Is there a limit on gifts?', a: 'No. Every time you fill a card, you get another gift.' },
 ];
 </script>
 
@@ -54,18 +49,17 @@ const faqs = [
         <InkStamp class="hero-ghost" ring="STAMP · STAMP · STAMP · FREE GIFT · " :texture="false" />
         <div class="container hero-inner">
           <p class="hero-kicker">M Souq Rewards</p>
-          <h1 class="display">Three stamps.<br /><span>One free gift.</span></h1>
-          <p class="hero-lede">Get a stamp each time you shop with us. Fill your card and choose a free gift.</p>
+          <h1 class="display">Shop at M Souq.<br /><span>Get free gifts.</span></h1>
+          <p class="hero-lede">Collect a stamp each time you buy. Three stamps gets you a gift: earbuds, a smart band and more.</p>
 
           <div
             class="try-card" :class="{ 'is-thump': thump, 'is-full': tryMarks === STAMP_TARGET }"
-            role="button" tabindex="0" aria-label="Press a stamp on the example card"
+            role="button" tabindex="0" aria-label="Add a stamp to the example card"
             @click="stampIt" @keydown.enter.prevent="stampIt" @keydown.space.prevent="stampIt"
           >
             <LoyaltyCard name="Your name" number="20250316" :marks="tryMarks" decorative />
           </div>
           <div class="try-caption">
-            <p aria-live="polite">{{ tryCaption }}</p>
             <span class="try-chip" aria-hidden="true">
               <template v-if="tryMarks === STAMP_TARGET"><RotateCcw :size="14" /> Again</template>
               <template v-else><Stamp :size="14" /> Tap</template>
@@ -74,9 +68,9 @@ const faqs = [
 
           <div class="hero-cta">
             <RouterLink :to="memberCard ? '/card/' : '/join/'" class="btn btn-saffron btn-lg btn-block">
-              {{ memberCard ? 'Open my card' : 'Get your free card' }}<ArrowRight :size="18" aria-hidden="true" />
+              {{ memberCard ? 'Open my card' : 'Get my card' }}<ArrowRight :size="18" aria-hidden="true" />
             </RouterLink>
-            <p class="hero-fine">Free · No app · Ready in seconds</p>
+            <p class="hero-fine">Free · No app · No hassle</p>
           </div>
         </div>
       </section>
@@ -84,23 +78,19 @@ const faqs = [
       <section id="how-it-works" class="section" aria-labelledby="how-heading">
         <div class="container">
           <p class="kicker">How it works</p>
-          <h2 id="how-heading" class="title">Three visits.<br />One gift.</h2>
-          <p class="section-lede">Every qualifying visit earns one stamp. Here’s how a full card adds up.</p>
+          <h2 id="how-heading" class="title">Collect stamps,<br />pick a gift.</h2>
 
           <div class="receipt-wrap">
             <div class="receipt">
               <div class="r-head">
                 <strong>M Souq</strong>
-                <span>Rewards · stamp slip</span>
               </div>
               <hr class="r-rule" />
-              <ol class="r-lines">
-                <li v-for="(visit, i) in visits" :key="i">
-                  <span class="r-n">0{{ i + 1 }}</span>
-                  <span class="r-item">Visit</span>
+              <ol class="r-lines r-steps">
+                <li v-for="step in steps" :key="step.title">
+                  <span class="r-item">{{ step.title }}</span>
                   <span class="r-dots" aria-hidden="true" />
-                  <span class="r-amt">+1 stamp</span>
-                  <span class="r-note">{{ visit.note }}</span>
+                  <span class="r-amt">{{ step.amount }}</span>
                 </li>
               </ol>
               <hr class="r-rule" />
@@ -109,7 +99,7 @@ const faqs = [
                 <div><dt>Your gift</dt><span class="r-dots" aria-hidden="true" /><dd><span class="r-free">Free</span></dd></div>
               </dl>
               <hr class="r-rule" />
-              <p class="r-foot">Show your card at checkout<br />Thank you for shopping</p>
+              <p class="r-foot">Show your card at the counter<br />Thank you for shopping</p>
               <div class="r-barcode" aria-hidden="true" />
             </div>
           </div>
@@ -118,16 +108,15 @@ const faqs = [
 
       <section id="gifts" class="section section-tint" aria-labelledby="gift-heading">
         <div class="container">
-          <p class="kicker">The gift shelf</p>
-          <h2 id="gift-heading" class="title">What a full card gets you.</h2>
-          <p class="section-lede">The selection changes with the season. Ask in store to see what’s on the shelf today.</p>
+          <p class="kicker">Gifts</p>
+          <h2 id="gift-heading" class="title">On the gift shelf right now.</h2>
           <ul class="shelf" aria-label="Gifts">
             <li v-for="gift in gifts" :key="gift.name" class="tag" :class="{ 'is-more': gift.more }">
               <component :is="gift.icon" class="tag-icon" :size="30" :stroke-width="1.6" aria-hidden="true" />
               <span class="tag-name">{{ gift.name }}</span>
               <span class="tag-note">{{ gift.note }}</span>
               <span class="tag-price">
-                <span class="tag-cost">With 3 stamps</span>
+                <span class="tag-cost">3 stamps</span>
                 <span class="tag-free">Free</span>
               </span>
             </li>
@@ -137,8 +126,8 @@ const faqs = [
 
       <section id="questions" class="section" aria-labelledby="faq-heading">
         <div class="container">
-          <p class="kicker">Questions</p>
-          <h2 id="faq-heading" class="title">Good to know.</h2>
+          <p class="kicker">FAQ</p>
+          <h2 id="faq-heading" class="title">Questions</h2>
           <div class="faq">
             <details v-for="item in faqs" :key="item.q">
               <summary>{{ item.q }}<Plus class="faq-icon" :size="18" aria-hidden="true" /></summary>
@@ -152,10 +141,16 @@ const faqs = [
         <div class="coupon">
           <Scissors class="coupon-cut" :size="18" aria-hidden="true" />
           <InkStamp class="coupon-stamp" />
-          <h2 class="title">Your first stamp is one visit away.</h2>
-          <p>Make your card now so it’s ready at the till.</p>
+          <template v-if="memberCard">
+            <h2 class="title">Get rewarded every time you shop.</h2>
+            <p>Show your card at the counter and we’ll add your stamp.</p>
+          </template>
+          <template v-else>
+            <h2 class="title">Get your card before you shop.</h2>
+            <p>It’s free and takes about ten seconds.</p>
+          </template>
           <RouterLink :to="memberCard ? '/card/' : '/join/'" class="btn btn-primary btn-lg btn-block">
-            {{ memberCard ? 'Open my card' : 'Get your free card' }}<ArrowRight :size="18" aria-hidden="true" />
+            {{ memberCard ? 'Open my card' : 'Get my card' }}<ArrowRight :size="18" aria-hidden="true" />
           </RouterLink>
         </div>
       </section>
