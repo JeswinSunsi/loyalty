@@ -266,7 +266,6 @@ main:focus { outline: none; }
 .steps { display: grid; gap: 4px; margin: 28px 0 0; padding: 0; list-style: none; }
 .step { display: grid; grid-template-columns: auto 1fr; gap: 16px; padding: 18px 0; border-top: 1px solid var(--line); }
 .step-title { display: flex; align-items: baseline; gap: 10px; font-size: 17px; letter-spacing: -.015em; }
-.step-n { color: var(--faint); font-family: var(--font-mono); font-size: 13px; font-weight: 500; }
 .step-note { margin-top: 4px; color: var(--muted); font-size: 15.5px; line-height: 1.55; }
 .icon-tile { display: inline-grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; border-radius: 10px; background: var(--brand-tint); color: var(--brand); }
 .icon-tile-sm { width: 32px; height: 32px; border-radius: 8px; }

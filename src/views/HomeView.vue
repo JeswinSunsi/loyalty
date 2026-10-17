@@ -24,8 +24,8 @@ const facts = [
 ];
 const steps = [
   { icon: UserRound, title: 'Make your card', note: 'Type your name and you’re done. The card is saved on your phone.' },
-  { icon: ScanLine, title: 'Get stamped', note: 'Show your card when you pay and we’ll add a stamp. Ask at the till if your purchase counts.' },
-  { icon: Gift, title: 'Pick a gift', note: 'Your third stamp gets you a gift from the shelf. Then your card starts again.' },
+  { icon: ScanLine, title: 'Shop at M Souq', note: 'Show your card when you pay and we’ll add a stamp. Ask at the till if your purchase counts.' },
+  { icon: Gift, title: 'Get rewards', note: 'Your third stamp gets you a gift from the shelf. Then your card starts again.' },
 ];
 const gifts = [
   { icon: Headphones, name: 'Earbuds', note: 'Wireless, with a charging case' },
@@ -79,10 +79,10 @@ const faqs = [
           <p class="kicker">How it works</p>
           <h2 id="how-heading" class="title">Collect stamps, <span>pick a gift.</span></h2>
           <ol class="steps">
-            <li v-for="(step, i) in steps" :key="step.title" class="step">
+            <li v-for="step in steps" :key="step.title" class="step">
               <span class="icon-tile"><component :is="step.icon" :size="18" aria-hidden="true" /></span>
               <div>
-                <h3 class="step-title"><span class="step-n">0{{ i + 1 }}</span>{{ step.title }}</h3>
+                <h3 class="step-title">{{ step.title }}</h3>
                 <p class="step-note">{{ step.note }}</p>
               </div>
             </li>
